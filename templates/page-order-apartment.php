@@ -163,7 +163,7 @@ while (have_posts()) : the_post();
                                     <label class="d-flex align-items-center gap-1">
                                       <div class="checkbox-wrapper-30">
                                         <span class="checkbox">
-                                          <input type="checkbox" name="order_detail_items[]" value="order_detail_item_<?= $id . '-' . $id_menu ?>" <?= $default_checked ? 'checked' : '' ?> />
+                                          <input type="checkbox" name="order_detail_items[]" value="order_detail_item_<?= $id . '-' . $id_menu ?>" data-name="<?= esc_attr($name) ?>" <?= $default_checked ? 'checked' : '' ?> />
                                           <svg>
                                             <use xlink:href="#checkbox-30" class="checkbox"></use>
                                           </svg>

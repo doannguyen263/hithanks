@@ -4,6 +4,9 @@
  * Handle order form submissions
  */
 
+// Include PDF generation functions
+require_once get_template_directory() . '/inc/order-pdf.php';
+
 // Add AJAX action hooks
 add_action('wp_ajax_submit_order_form', 'handle_submit_order_form');
 add_action('wp_ajax_nopriv_submit_order_form', 'handle_submit_order_form');
@@ -72,10 +75,19 @@ function handle_submit_order_form() {
     'post_content' => $formatted_content
   ));
 
+  // Generate PDF for order
+  $pdf_url = '';
+  try {
+    $pdf_url = generate_order_pdf($order_id, $order_detail, $order_overview, $contact_info, $totals);
+  } catch (Exception $e) {
+    error_log('[order.php] PDF generation error: ' . $e->getMessage());
+  }
+
   // Set response
   $response = array(
     'order_id' => $order_id,
-    'redirect_url' => admin_url('post.php?post=' . $order_id . '&action=edit')
+    'redirect_url' => admin_url('post.php?post=' . $order_id . '&action=edit'),
+    'pdf_url' => $pdf_url
   );
 
   wp_send_json_success($response);
@@ -108,12 +120,15 @@ function format_order_content($order_detail, $order_overview, $contact_info, $to
     foreach ($order_detail as $item) {
       $price = isset($item['price']) ? (int)$item['price'] : 0;
       $order_total += $price;
+      
+      // Get name if available, otherwise use id
+      $name = isset($item['name']) ? $item['name'] : (isset($item['id']) ? $item['id'] : 'N/A');
+      
       $content .= '<tr>';
-      $content .= '<td>' . esc_html($item['id']) . '</td>';
+      $content .= '<td>' . esc_html($name) . '</td>';
       $content .= '<td class="text-right">' . number_format($price, 0, ',', '.') . ' đ</td>';
       $content .= '</tr>';
     }
-    $content .= '<tr><td><strong>Tổng cộng:</strong></td><td class="text-right"><strong>' . number_format($order_total, 0, ',', '.') . ' đ</strong></td></tr>';
     $content .= '</table>';
   }
 
@@ -130,7 +145,6 @@ function format_order_content($order_detail, $order_overview, $contact_info, $to
       $content .= '<td class="text-right">' . number_format($item['price'], 0, ',', '.') . ' đ</td>';
       $content .= '</tr>';
     }
-    $content .= '<tr><td colspan="2"><strong>Tổng cộng:</strong></td><td class="text-right"><strong>' . number_format($overview_total, 0, ',', '.') . ' đ</strong></td></tr>';
     $content .= '</table>';
   }
 

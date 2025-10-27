@@ -183,7 +183,7 @@
       // Use Math.round to avoid floating point errors
       const result = Math.round(quantity * coefficient * orderDetailTotal);
       
-      console.info('calculateItem:', {
+      console.info('[order.js] calculateItem:', {
         quantity,
         coefficient,
         orderDetailTotal,
@@ -212,7 +212,7 @@
       if ($orderDetailTotal.length > 0) {
         const totalText = $orderDetailTotal.text().replace(/\./g, '').replace(' đ', '').trim();
         this.orderDetailBaseTotal = parseInt(totalText, 10) || 0;
-        console.info('orderDetailBaseTotal updated:', this.orderDetailBaseTotal);
+        console.info('[order.js] orderDetailBaseTotal updated:', this.orderDetailBaseTotal);
       } else {
         this.orderDetailBaseTotal = 0;
       }
@@ -267,8 +267,32 @@
         const value = $(checkbox).val();
         const price = orderCalculator.priceMap[value] || 0;
         
+        // Get name from data-name attribute (most reliable)
+        const $checkbox = $(checkbox);
+        let name = $checkbox.data('name');
+        
+        console.info('[order.js] Extracting name:', {
+          value: value,
+          dataName: name,
+          checkbox: $checkbox[0]
+        });
+        
+        // Fallback: try to get from DOM if data-name is not available
+        if (!name) {
+          const $label = $checkbox.closest('label');
+          const $nameSpan = $label.find('span.fw-bold');
+          name = $nameSpan.text().trim();
+          console.info('[order.js] Fallback - getting from DOM:', { foundSpan: $nameSpan.length, name });
+        }
+        
+        // Final fallback to value if still no name
+        if (!name) {
+          name = value;
+        }
+        
         window.formData.orderDetail.selectedItems.push({
           id: value,
+          name: name,
           price: price,
           priceFormatted: formatVND(price)
         });
@@ -335,7 +359,7 @@
         $totalDisplay.text(formatVND(grandTotal));
       }
       
-      console.info('Global form data updated:', window.formData);
+      console.info('[order.js] Global form data updated:', window.formData);
     }
   }
 
@@ -344,7 +368,7 @@
   let overviewCalculator = null;
   
   $(document).ready(function() {
-    console.info('Order form script loaded');
+    console.info('[order.js] Order form script loaded');
     
     // Initialize Order Detail Calculator
     orderCalculator = new OrderDetailCalculator();
@@ -359,7 +383,7 @@
     // Check if form exists
     const $form = $('#order-apartment-form');
     if ($form.length > 0) {
-      console.info('Form found, attaching submit handler');
+      console.info('[order.js] Form found, attaching submit handler');
       
       // Helper function to show error message
       function showError($input, message) {
@@ -440,7 +464,7 @@
         const checkedBoxes = $('input[name="order_detail_items[]"]:checked');
         if (checkedBoxes.length === 0) {
           isValid = false;
-          console.warn('Please select at least one design detail');
+          console.warn('[order.js] Please select at least one design detail');
           alert('Vui lòng chọn ít nhất một mục trong Chi tiết thiết kế');
         }
         
@@ -484,11 +508,11 @@
       // Handle form submission
       $form.on('submit', function(e) {
         e.preventDefault();
-        console.info('Form submitted');
+        console.info('[order.js] Form submitted');
         
         // Validate form
         if (!validateForm()) {
-          console.info('Form validation failed');
+          console.info('[order.js] Form validation failed');
           // Scroll to first error
           const firstError = $('.error').first();
           if (firstError.length) {
@@ -499,11 +523,11 @@
           return false;
         }
         
-        console.info('Form validation passed, submitting...');
+        console.info('[order.js] Form validation passed, submitting...');
         
         // Collect all form data
         const formData = collectFormData();
-        console.info('Form data collected:', formData);
+        console.info('[order.js] Form data collected:', formData);
         
         // Show loading state
         const $button = $form.find('button[type="submit"]');
@@ -516,7 +540,7 @@
         return false;
       });
     } else {
-      console.error('Form #order-apartment-form not found!');
+      console.error('[order.js] Form #order-apartment-form not found!');
     }
   });
 
@@ -576,7 +600,7 @@
    * Submit order via AJAX
    */
   function submitOrderAjax(data, $button, originalText) {
-    console.info('Submitting data:', data);
+    console.info('[order.js] Submitting data:', data);
     
     $.ajax({
       url: dntheme_params.ajax_url,
@@ -591,16 +615,31 @@
         totals: data.totals
       },
       success: function(response) {
-        console.info('AJAX Success:', response);
+        console.info('[order.js] AJAX Success:', response);
         
         if (response.success) {
           // Show success message
           alert('Đơn hàng của bạn đã được gửi thành công! Mã đơn hàng: ' + response.data.order_id);
           
-          // Optionally redirect or show order details
+          console.info('[order.js] Response data:', response.data);
+          
+          // Open admin edit page in new tab
           if (response.data.redirect_url) {
-            window.location.href = response.data.redirect_url;
+            window.open(response.data.redirect_url, '_blank');
+            console.info('[order.js] Opened admin page in new tab:', response.data.redirect_url);
           }
+          
+          // Open PDF in new tab if available
+          if (response.data.pdf_url) {
+            window.open(response.data.pdf_url, '_blank');
+            console.info('[order.js] Opened PDF in new tab:', response.data.pdf_url);
+          }
+          
+          // Reset form after successful submission
+          $('#order-apartment-form')[0].reset();
+          
+          // Reset button
+          $button.prop('disabled', false).html(originalText);
         } else {
           // Show error message
           alert('Có lỗi xảy ra: ' + (response.data || 'Vui lòng thử lại'));
@@ -608,9 +647,9 @@
         }
       },
       error: function(xhr, status, error) {
-        console.error('AJAX Error:', error);
-        console.error('Response text:', xhr.responseText);
-        console.error('Status:', xhr.status);
+        console.error('[order.js] AJAX Error:', error);
+        console.error('[order.js] Response text:', xhr.responseText);
+        console.error('[order.js] Status:', xhr.status);
         
         let errorMsg = 'Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.';
         if (xhr.responseText) {
@@ -618,7 +657,7 @@
             const response = JSON.parse(xhr.responseText);
             errorMsg = response.data || errorMsg;
           } catch(e) {
-            console.error('Could not parse error response');
+            console.error('[order.js] Could not parse error response');
           }
         }
         

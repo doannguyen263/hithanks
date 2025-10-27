@@ -229,6 +229,8 @@ require get_parent_theme_file_path( '/inc/dn-boostspeed.php' );
 require get_parent_theme_file_path( '/inc/dn-helpers.php' );
 require get_parent_theme_file_path( '/inc/woocommerce.php' );
 require get_parent_theme_file_path( '/inc/order.php' );
+require_once get_template_directory() . '/inc/order.php';
+
 /**
  * Thiết lập mặc định khi upload trong bài viết
  * @author Đoàn Nguyễn
