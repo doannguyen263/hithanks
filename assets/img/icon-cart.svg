@@ -1,0 +1,23 @@
+<svg id="Group_4_-_ex" data-name="Group 4 - ex" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="221" height="166" viewBox="0 0 221 166">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #6b6b6b;
+        fill-rule: evenodd;
+      }
+    </style>
+    <image id="image" width="87" height="5" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAAAFCAYAAAAwjnCQAAAAUElEQVQ4jWP8//8/Q05Ozn+GUUA1oKqquj8mJqaA+c2bN6MBS2Xw7t07xadPn2YxDStfDS6wj2nKlCmMIz0UaAScwCl3NICpC0Dh+e7dOwYAWcEaxWvQNXwAAAAASUVORK5CYII="/>
+    <image id="image-2" width="105" height="5" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAAAFCAYAAABGtMIbAAAAQklEQVRIie3TUQ2AMBBEwWmDNhBzKpAF5mj4qIdrriPhbbZFBDw4bSkd+PY0ufXqAVbwj9TwVg+R2XzShbt6jJQwAOAeBM6gF7McAAAAAElFTkSuQmCC"/>
+  </defs>
+  <image id="Layer_2_copy_2" data-name="Layer 2 copy 2" x="11" y="39" width="5" height="86" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAABWCAYAAAAHdVy8AAAAOElEQVQ4je3V0QkAIAwD0cZ123Gyb4qgIm4g5D7fAgdJUVWKFUkgMw/sxgthNBqNRuN/OEd3A0k0SrINYkYeLLwAAAAASUVORK5CYII="/>
+  <image id="Layer_2_copy_6" data-name="Layer 2 copy 6" x="13" y="39" width="6" height="86" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAABWCAYAAADsQue/AAAATElEQVRIiWP8//8/Q05Ozn8GKJgyZQojiMWYnZ0NF0SWZEIXhIFRiVGJUYlRiVGJUYlRiQGSwFpt43QVqD4nXQduD8IaD8iqGRgYGACqMxcXnl/2LgAAAABJRU5ErkJggg=="/>
+  <use id="Layer_2_copy" data-name="Layer 2 copy" x="112" y="122" xlink:href="#image"/>
+  <use id="Layer_2_copy_8" data-name="Layer 2 copy 8" x="112" y="120" xlink:href="#image"/>
+  <use id="Layer_2_copy_10" data-name="Layer 2 copy 10" x="11" y="122" xlink:href="#image-2"/>
+  <use id="Layer_2_copy_11" data-name="Layer 2 copy 11" x="11" y="120" xlink:href="#image-2"/>
+  <image x="193" y="88" width="6" height="39" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAnCAYAAAAsPDnbAAAAR0lEQVQokWP8//8/Q05OjhMDA8N6BgQIZIGy9zKggr1MDDjAqMSoxMiRYH7z5s1/rD6fMmUKIw2DBGQ8LHN+QhLkZ2BgYAAAMZ8RSlGQBRoAAAAASUVORK5CYII="/>
+  <image id="Layer_2_copy_9" data-name="Layer 2 copy 9" x="191" y="88" width="6" height="39" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAnCAYAAAAsPDnbAAAASUlEQVQokWP8//8/Q05OjhMDA8N6BgQIZIGy9zKggr1MDDjAqMSoxFCVYH7z5s1/rP6YMmUKI3V0UCmsQMbDMucnJEF+BgYGBgBGLhbLLDq6VQAAAABJRU5ErkJggg=="/>
+  <image id="Layer_2_copy_4" data-name="Layer 2 copy 4" x="187" y="84" width="10" height="17" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAARCAYAAADkIz3lAAAA2ElEQVQokX3RyypGURgG4Mch5DBUchXKzCGZGokJiSgj+xJch7FiYmZGGEgGMlSuwUyR5BTp+1t78vftvUartZ7e3vWtnqqqtKwJDOCptwWNYh8nmO9vgbPYwSDGmhLjcgMjJfG6CS5gFc84xFsGI2UTwzjDXRxmcArreMUxPprgHvpwidv6sBvOYQXfpdtnBiNlF0O4KIkyOIOlsj/AbwZj8GsYxynuu4vXcBrL+MIRXjIYnbYwiXNcJZPowEVsl5dG2nsGo9sPHvEQf5qhGt6U2f1l3ToL/7x4J+2I9DIWAAAAAElFTkSuQmCC"/>
+  <image id="Layer_2_copy_5" data-name="Layer 2 copy 5" x="194" y="84" width="10" height="17" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAARCAYAAADkIz3lAAAA00lEQVQokX3STSvEURQH4GcY72ZnNR+D7KRYWkzJxpQ0NTv/z6B8B2uJJCs7kkYsbFj7EJQFSd5KOroLqTO/1e323NPp3FOrqqqOJj5xL8kA5nCETUz2gw3MolMepfAKhxjHGoYz+IJdPGIFixmM3OAEo6XqRAbfcIAntDGdwcg1zsvdRj/4jh18YRnzGYz0cIYRdDGYwW9sl/PS37n+h5FbHGMKqxjK4DP28IEWZjIYucBpWZb42rEMvmK/VF3HQgYjl6WFuxhZ7GKW6HXrd0Q8/AAXLCg/1GdM6wAAAABJRU5ErkJggg=="/>
+  <path id="Layer_2_copy_7" data-name="Layer 2 copy 7" class="cls-1" d="M204,100l-8-16h-1l-8,16h17Z"/>
+</svg>

@@ -1,0 +1,89 @@
+<?php
+/**
+ * Template Name: Page History
+ *
+ * This is the template that displays all pages by default.
+ * Please note that this is the WordPress construct of pages
+ * and that other 'pages' on your WordPress site may use a
+ * different template.
+ *
+ * @package    WordPress
+ * @subpackage Dntheme
+ * @version 1.0
+ */
+
+get_header();
+while ( have_posts() ) : the_post(); $get_the_ID = get_the_ID();
+if ( $post->post_parent ){
+  $title_parent = get_the_title( $post->post_parent );
+}else{
+  $title_parent = get_the_title();
+}
+
+?>
+<div class="nav-dieuhuong" data-toggle="sticky-onscroll">
+  <div class="container">
+    <div class="d-flex align-items-center">
+      <div class="nav-dieuhuong__title back-to-top"><?= $title_parent ?></div>
+      <ul class="nav-list d-flex justify-content-md-end ms-md-auto">
+        <?php echo rt_list_child_pages(); ?>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="container"><hr class="mt-0"></div>
+
+<div class="page__content pb-5">
+    <div class="container">
+
+      <div class="about-heading">
+        <h1 class="about-heading__title"><?php the_field('sub') ?></h1>
+        <?php
+        $get_field_sub2 = get_field('sub2');
+        if ( $get_field_sub2 ): ?>
+          <div class="about-heading__sub h2"><?= $get_field_sub2 ?></div>
+        <?php endif ?>
+      </div>
+      <hr>
+        <?php
+        if( have_rows('items') ):
+          echo "<div class='about__timeline mb-5'>";
+            while( have_rows('items') ) : the_row();
+                // Load sub field value.
+                $sub_title = get_sub_field('title');
+                $sub_content = get_sub_field('content'); ?>
+                <div class="timeline-post wow fadeInUp">
+                  <div class="timeline-post__date"><?php echo $sub_title; ?></div>
+                  <div class="timeline-post__meta">
+                    <div class="timeline-post__content"><?php echo $sub_content; ?></div>
+                  </div>
+                </div>
+                <?php
+            endwhile;
+            echo "</div>";
+        endif;
+        ?>
+
+        <div class="entry-content">
+          <?php the_content() ?>
+        </div>
+        <hr class="mb-0">
+        <div class="page-list">
+          <?php
+          $pagelist = get_field('page_menu');
+          if( $pagelist ): ?>
+
+            <?php foreach ($pagelist as $item) { ?>
+
+              <li><a href="<?php the_permalink( $item->ID ) ?>"><?= $item->post_title ?></a></li>
+
+              <?php
+            }
+          endif;
+          ?>
+        </div>
+    </div>
+</div>
+
+<?php endwhile; ?>
+<?php get_footer();

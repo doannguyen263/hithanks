@@ -1,0 +1,52 @@
+.tagcloud{display:none;}
+#postexcerpt .inside p{display:none;}
+textarea#excerpt{height:250px;}
+li#toplevel_page_hk_options ul li:last-child,li#toplevel_page_hk_options ul li:nth-child(4),li#wp-admin-bar-hk_options_3,li#wp-admin-bar-hk_options_4{display:none;}
+ul.select2-choices.ui-sortable{padding:5px;background:#C6FDF4;border:1px solid #6BC9BA;}
+li.select2-search-choice{border-radius:0px!important;background:#137D6C!important;border:1px solid #137D6C!important;color:#fff!important;height:22px!important;line-height:22px!important;padding:4px 22px!important;margin:0px!important;margin-right:8px!important;}
+.error.notice{display:none;}
+a.select2-search-choice-close{background-color:#FEFFFF;margin-top:5px;border-radius:50%;margin-right:5px!important;}
+div#widgets-right .sidebar-description{min-height:0px!important;margin-top:0px!important;}
+div#widgets-right .widgets-sortables{min-height:inherit!important;}
+.sidebar-name-arrow{display:none!important;}
+ul#adminmenu{background-color:#0A3E71;}
+div#wpadminbar{background:#0A3E71;}
+#adminmenu .wp-has-current-submenu .wp-submenu,#adminmenu .wp-has-current-submenu .wp-submenu.sub-open,#adminmenu .wp-has-current-submenu.opensub .wp-submenu,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu,.no-js li.wp-has-current-submenu:hover .wp-submenu{background-color:#022C54;}
+#adminmenu li.menu-top:hover,#adminmenu li.opensub>a.menu-top,#adminmenu li>a.menu-top:focus{background-color:#022C54;}
+#adminmenu .wp-submenu,.folded #adminmenu .wp-has-current-submenu .wp-submenu,.folded #adminmenu a.wp-has-current-submenu:focus+.wp-submenu{background-color:#022C54;}
+#adminmenu,#adminmenu .wp-submenu,#adminmenuback,#adminmenuwrap{background-color:#0A3E71;}
+#adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover:after{border-right-color:#0A3E71;}
+#wpadminbar .ab-top-menu>li.hover>.ab-item,#wpadminbar.nojq .quicklinks .ab-top-menu>li>.ab-item:focus,#wpadminbar:not(.mobile) .ab-top-menu>li:hover>.ab-item,#wpadminbar:not(.mobile) .ab-top-menu>li>.ab-item:focus{background:#022C54;color:#47D8FF;}
+#wpadminbar .menupop .ab-sub-wrapper,#wpadminbar .shortlink-input{background:#022C54;}
+.featured_js_posts a:nth-child(2){display:none!important}
+
+/*Menu*/
+#toplevel_page_woocommerce-marketing{display:none;}
+#toplevel_page_wc-admin-path--analytics-overview{display:none;}
+
+/*Fix Yoast SEo*/
+#wpseo-filter,#wpseo-readability-filter{display:none;}
+
+/*Redux Framework*/
+body:not(.post-type-page) #pageparentdiv{display:none;}
+#redux-header{display:none;}
+.redux-action_bar #redux-defaults-section,.redux-action_bar #redux-defaults{display:none;}
+.redux-slides-list>li:first-child{margin-bottom:6px!important;}
+.redux-container .redux-main img{max-height:100px;}
+
+/*Them boostrap*/
+.img-fluid{max-width:100%;}
+
+/*Fix Flexible Posts Widget*/
+.js .widget .inside{display:none;}
+.js .widget.open .inside{display:block;}
+.mb-05{margin-bottom:.5rem}
+
+/*Toi uu san pham*/
+/* #woocommerce-embedded-root{display:none;}
+div#woocommerce-embedded-root + #wpbody{margin-top:0!important;}
+#woocommerce-product-data .type_box{display:none!important;}
+li.shipping_tab,li.linked_product_tab,li.attribute_tab,li.variations_tab,li.advanced_tab,li.marketplace-suggestions_tab{display:none!important;}
+div#woocommerce-product-data {
+    display: none;
+} */

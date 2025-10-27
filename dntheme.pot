@@ -1,0 +1,280 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: default\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-12-21 07:35+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.3; wp-6.1.1\n"
+"X-Domain: dntheme"
+
+#. %s: Taxonomy singular name
+#: functions.php:264
+#, php-format
+msgid "%s"
+msgstr ""
+
+#: inc/woocommerce.php:228
+#, php-format
+msgid "&nbsp;&ndash; Page %s"
+msgstr ""
+
+#. used between list items, there is a space after the comma
+#: inc/template-tags.php:90
+msgid ", "
+msgstr ""
+
+#. %s: post date
+#: inc/template-tags.php:76
+#, php-format
+msgid "<span class=\"screen-reader-text\">Posted on</span> %s"
+msgstr ""
+
+#: inc/woocommerce.php:362
+msgid "<strong>Error</strong>: Họ và tên là bắt buộc!"
+msgstr ""
+
+#: inc/woocommerce.php:383
+msgid "<strong>Error</strong>: Mật khẩu không trùng nhau!"
+msgstr ""
+
+#: inc/woocommerce.php:377
+msgid "<strong>Error</strong>: Số điện thoại không đúng định dạng"
+msgstr ""
+
+#: inc/woocommerce.php:366
+msgid "<strong>Error</strong>: Số điện thoại là bắt buộc!"
+msgstr ""
+
+#: functions.php:47 functions.php:57
+msgid ""
+"Add widgets here to appear in your sidebar on blog posts and archive pages."
+msgstr ""
+
+#: functions.php:266
+msgid "Archives:"
+msgstr ""
+
+#: 404.php:32
+msgid "Back Homepage"
+msgstr ""
+
+#: functions.php:45
+msgid "Blog Sidebar"
+msgstr ""
+
+#. %s: post author
+#: inc/template-tags.php:46
+#, php-format
+msgid "by %s"
+msgstr ""
+
+#: inc/template-tags.php:108
+msgid "Categories"
+msgstr ""
+
+#: inc/woocommerce.php:307
+msgid "Checkout details"
+msgstr ""
+
+#: inc/woocommerce.php:401
+#, php-format
+msgid ""
+"Chấp nhận chính sách bảo mật của Hithanks và đồng ý để Hithanks lưu thông "
+"tin cá nhân của tôi <a href=\"%s\" target=\"_blank\" class=\"woocommerce-"
+"terms-and-conditions-link\">chính sách riêng tư </a> của chúng tôi."
+msgstr ""
+
+#: inc/woocommerce.php:87
+msgid "Contact"
+msgstr ""
+
+#: 404.php:31
+msgid ""
+"Có vẻ như các trang mà bạn đang cố gắng tiếp cận không tồn tại nữa hoặc có "
+"thể nó vừa di chuyển."
+msgstr ""
+
+#. Name of the theme
+msgid "default"
+msgstr ""
+
+#. Description of the theme
+msgid ""
+"Dntheme brings your site to life with header video and immersive featured "
+"images."
+msgstr ""
+
+#. %s: Name of current post
+#: inc/template-tags.php:140
+#, php-format
+msgid "Edit<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgstr ""
+
+#: functions.php:55
+msgid "Footer Sidebar"
+msgstr ""
+
+#: inc/template-tags.php:174
+#, php-format
+msgid "Front Page Section %1$s Placeholder"
+msgstr ""
+
+#: inc/dn-helpers.php:86
+msgid "Giá liên hệ"
+msgstr ""
+
+#: templates/page-checkout.php:26
+msgid "Giỏ hàng"
+msgstr ""
+
+#. Author URI of the theme
+msgid "https://wordpress.org"
+msgstr ""
+
+#: 404.php:28
+msgid "Lỗi không tìm thấy trang"
+msgstr ""
+
+#: functions.php:23
+msgid "Main Menu"
+msgstr ""
+
+#: functions.php:24
+msgid "MB Menu"
+msgstr ""
+
+#: functions.php:256
+msgctxt "monthly archives date format"
+msgid "F Y"
+msgstr ""
+
+#: footer.php:67
+msgid "Ngôn ngữ"
+msgstr ""
+
+#: search.php:26
+msgid "Nothing Found"
+msgstr ""
+
+#: 404.php:27
+msgid "Oops!"
+msgstr ""
+
+#: inc/woocommerce.php:309
+msgid "Order Complete"
+msgstr ""
+
+#. Name of the template
+msgid "Page About"
+msgstr ""
+
+#. Name of the template
+msgid "Page Account"
+msgstr ""
+
+#. Name of the template
+msgid "Page Career"
+msgstr ""
+
+#. Name of the template
+msgid "Page Cart"
+msgstr ""
+
+#. Name of the template
+msgid "Page Checkout"
+msgstr ""
+
+#. Name of the template
+msgid "Page Contact"
+msgstr ""
+
+#. Name of the template
+msgid "Page Faqs"
+msgstr ""
+
+#. Name of the template
+msgid "Page Home"
+msgstr ""
+
+#. Name of the template
+msgid "Page Making"
+msgstr ""
+
+#. Name of the template
+msgid "Page Policy"
+msgstr ""
+
+#. Name of the template
+msgid "Page Register"
+msgstr ""
+
+#. Name of the template
+msgid "Page Source Book"
+msgstr ""
+
+#: header.php:60 searchform.php:16
+msgctxt "placeholder"
+msgid "Nhập từ khóa cần tìm &hellip;"
+msgstr ""
+
+#: inc/template-tags.php:977
+msgid "Rút gọn"
+msgstr ""
+
+#: template-parts/content-none.php:11
+msgid "Rất tiếc, mục này chưa có dữ liệu."
+msgstr ""
+
+#: search.php:46
+msgid ""
+"Rất tiếc, nhưng không có gì phù hợp với cụm từ tìm kiếm của bạn. Vui lòng "
+"thử lại với một số từ khóa khác nhau."
+msgstr ""
+
+#: templates/page-cart.php:26
+msgid "Shopping"
+msgstr ""
+
+#: inc/woocommerce.php:305
+msgid "Shopping Cart"
+msgstr ""
+
+#: inc/template-tags.php:112
+msgid "Tags: "
+msgstr ""
+
+#: search.php:14
+msgid "Tìm kiếm"
+msgstr ""
+
+#: search.php:24
+#, php-format
+msgid "Tìm kiếm với từ khóa: %s"
+msgstr ""
+
+#: inc/woocommerce.php:225
+#, php-format
+msgid "Tìm kiếm với từ khóa: &ldquo;%s&rdquo;"
+msgstr ""
+
+#. Author of the theme
+msgid "wordpress.org"
+msgstr ""
+
+#: inc/template-tags.php:976
+msgid "Xem thêm"
+msgstr ""
+
+#: functions.php:254
+msgctxt "yearly archives date format"
+msgid "Y"
+msgstr ""
