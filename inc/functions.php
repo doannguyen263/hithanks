@@ -81,7 +81,7 @@ function order_post_type()
         'menu_icon' => 'dashicons-category',
         'rewrite' => array('slug' => 'don-hang-thiet-ke', 'with_front' => false),
     );
-    register_post_type('order', $args);
+    register_post_type('order-design', $args);
 
     $labels = array(
         'name'              => _x('Danh mục Đơn hàng thiết kế', 'Taxonomy General Name', 'dntheme'),
@@ -92,7 +92,7 @@ function order_post_type()
 
     register_taxonomy(
         'order_cat',
-        'order',
+        'order-design',
         array(
             'hierarchical' => true,
             'labels' => $labels,

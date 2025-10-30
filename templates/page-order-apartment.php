@@ -12,6 +12,26 @@
  * @subpackage Dntheme
  * @version 1.0
  */
+
+// Check if this is an order view request
+$order_id = isset($_GET['order']) ? intval($_GET['order']) : 0;
+$phone = isset($_GET['phone']) ? sanitize_text_field($_GET['phone']) : '';
+
+// If order ID and phone are present, display order view
+if ($order_id && $phone) {
+  $order_phone = get_post_meta($order_id, 'order_phone', true);
+
+  // If phone doesn't match, show error
+  if ($order_phone !== $phone) {
+    wp_die('Không tìm thấy đơn hàng hoặc thông tin không hợp lệ.', 'Lỗi', array('back_link' => true));
+  }
+
+  // Include the view order template
+  include get_template_directory() . '/templates/page-view-order.php';
+  return;
+}
+
+// Otherwise, continue with the normal form display
 $shop_page_url = get_permalink(wc_get_page_id('shop'));
 get_header();
 
@@ -97,14 +117,12 @@ while (have_posts()) : the_post();
           <h3 class="about-list__title">Quá trình thực hiện</h3>
         </div>
         <div class="col-md-9">
-          <div class="ctf7-making pb-5">
+          <div class="ctf7-making">
             <div class="entry-content">
               <p>Để đơn giản trong khi thực hiện dự án, chúng tôi đưa ra một số gợi ý, điều này mang lại sự thuận tiện trong quá trình cùng bạn tạo nên một dự án về không gian sống, trọn vẹn và ý nghĩa.</p>
-              <p><strong>1. LISTENNING:</strong> Lắng nghe, thấu hiểu các mong muốn, nhu cầu và kỳ vọng theo quan điểm của bạn. Tìm hiểu, làm rõ các hạng mục và chính sách của công ty có thể mang đến cho bạn, nhận thông tin, bản vẽ, hình ảnh tham khảo..., trao đổi về cách thức tổ chức không gian. Thiết lập các tiêu chí thiết kế... </p>
-              <p><strong>2. MAKING</strong>Khảo sát và phân tích hiện trạng, Đề xuất giải pháp, Thống nhất phương án, Hiệu chỉnh bản vẽ, Phát hành hồ sơ, Đồng bộ hiện trạng, Xác nhận sản xuất, Vận chuyển và lắp đặt sản phẩm tại công trình... </p>
-              <p><strong>3. FINISHING</strong>Giám sát thiết kế, Lưu trữ dữ liệu, Bảo trì sản phẩm</p>
             </div>
           </div>
+          <hr>
         </div>
       </div>
 
@@ -118,13 +136,12 @@ while (have_posts()) : the_post();
               <?php //echo do_shortcode('[contact-form-7 id="4d93a31" title="Form đặt hàng - APARTMENT"]'); 
               ?>
               <form id="order-apartment-form" class="order-form">
-                <p><strong>1/3. Hình ảnh căn hộ của bạn</strong></p>
+                <p><strong>1/3. Ghi chú về căn hộ của bạn</strong></p>
                 <div class="el-box">
                   <p><strong>Tải hình ảnh</strong></p>
-                  <p>Bất kỳ bức ảnh, bản phác thảo hoặc bản vẽ nào cũng sẽ hữu ích, ngay cả khi nó là một nét vẽ nguệch ngoạc trên mặt sau của một phong bì.</p>
-                  <?= do_shortcode('[mfile upload-file-377 min-file:0 max-file:5]') ?>
+                  <p>Bất kỳ bức ảnh hoặc bản vẽ nào cũng sẽ hữu ích, ngay cả khi nó là một nét vẽ phác thảo trên giấy.</p>
+                  <!-- <?= do_shortcode('[mfile upload-file-377 min-file:0 max-file:5]') ?> -->
                 </div>
-                <p><strong>2/3. Ghi chú về căn hộ của bạn</strong></p>
                 <div id="order-detail-design" class="el-box js-order-detail-design js-page-order">
                   <div class="row mb-3">
                     <div class="col-md-3">
@@ -146,7 +163,7 @@ while (have_posts()) : the_post();
                     ?>
                         <div class="row mb-3">
                           <div class="col-md-3">
-                            <strong class="fw-bold font-roboto ms-2"><?= $name ?></strong>
+                            <strong class="fw-bold  ms-2"><?= $name ?></strong>
                           </div>
                           <div class="col-md-9">
                             <?php
@@ -174,31 +191,30 @@ while (have_posts()) : the_post();
                                           </symbol>
                                         </svg>
                                       </div>
-                                      <span class="fw-bold font-roboto cursor-pointer"><?= $name ?></span>
+                                      <span class="fm-bold cursor-pointer"><?= $name ?></span>
                                     </label>
                                     <div>
                                       <?= $list ?>
                                     </div>
                                   </div>
                                   <div class="col-md-3 text-end">
-                                    <div class="js-order-detail-item-price-<?= $id . '-' . $id_menu ?> fw-medium font-roboto"><?= dntheme_number_format($price) ?></div>
+                                    <div class="js-order-detail-item-price-<?= $id . '-' . $id_menu ?> fw-medium "><?= dntheme_number_format_v2($price) ?></div>
                                   </div>
                                 </div>
                               <?php endwhile; ?>
                             <?php endif; ?>
-
                           </div>
                         </div>
                       <?php endwhile; ?>
-                      <hr>
-                      <div class="row mb-3">
+
+                      <!-- <div class="row mb-3 d-none">
                         <div class="col-md-3">
-                          <strong class="fw-bold font-roboto ms-2">Tổng cộng</strong>
+                          <strong class="fw-bold  ms-2">Tổng cộng</strong>
                         </div>
                         <div class="col-md-9 text-end">
                           <div class="js-order-detail-total-price page-item-price">0</div>
                         </div>
-                      </div>
+                      </div> -->
                     <?php endif; ?>
                   </div>
                 </div>
@@ -244,11 +260,11 @@ while (have_posts()) : the_post();
                             </div>
                             <div class="col-md-5">
                               <div class="form-group">
-                                <input type="number" name="order_overview_<?= $id ?>" class="form-control" placeholder="<?= $name ?>" data-coefficient="<?= $coefficient ?>" value="">
+                                <input type="number" name="order_overview_<?= $id ?>" class="form-control" placeholder="<?= $name ?>" data-coefficient="<?= $coefficient ?>" value="" min="0" max="999" step="1">
                               </div>
                             </div>
                             <div class="col-md-4 text-end">
-                              <div class="js-order-overview-<?= $id ?> fw-medium font-roboto">---</div>
+                              <div class="js-order-overview-<?= $id ?> fw-medium ">---</div>
                             </div>
                           </div>
                       <?php endwhile;
@@ -257,7 +273,7 @@ while (have_posts()) : the_post();
                       <hr>
                       <div class="row mb-3">
                         <div class="col-md-3">
-                          <strong class="fw-bold font-roboto ms-2">Tổng cộng</strong>
+                          <strong class="fw-bold  ms-2">Tổng cộng</strong>
                         </div>
                         <div class="col-md-9 text-end">
                           <div class="js-order-detail-total-price page-item-price">0</div>
@@ -267,7 +283,7 @@ while (have_posts()) : the_post();
                   </div>
                 </div>
 
-                <p><strong>3/3. Thông tin liên hệ của bạn</strong></p>
+                <p><strong>2/3. Thông tin liên hệ của bạn</strong></p>
                 <div class="el-box">
                   <div class="ctf7_groupinfo">
                     <div class="mb-3 row">
@@ -312,19 +328,38 @@ while (have_posts()) : the_post();
                     </div>
                   </div>
 
-                  <div class="position-relative"><button type="submit" class="btn btn-primary">Gửi yêu cầu và xem thông tin</button></div>
+                </div>
+
+
+                <p><strong>3/3. Thông tin liên hệ của bạn</strong></p>
+                <div class="el-box">
+                  <p>Sau khi bạn điền và gửi thông tin đầy đủ phía trên, bạn sẽ nhận được danh mục các nội dung hồ sơ thiết kế, chi tiết trong Hồ sơ được thể hiện đầy đủ các hạng mục thiết kế và giá cả đi kèm. Đây chính là phần nội dung thiết kế bạn sẽ nhận được sau khi đặt hàng, Conceptor (Người hướng dẫn thiết kế) sẽ trực tiếp hướng dẫn để dự án của bạn được tiến hành thiết kế nhanh chóng.</p>
+                </div>
+                <div class="position-relative text-end"><button type="submit" class="btn btn-primary">Xem hồ sơ thiết kế của bạn</button></div>
+
               </form>
+
+
             </div>
           </div>
         </div>
       </div>
+      <hr>
 
       <div class="row">
         <div class="col-md-3">
-          <h3 class="about-list__title">Xem và gửi yêu cầu</h3>
+          <h3 class="about-list__title">Hỗ trợ</h3>
         </div>
         <div class="col-md-9">
-          <p>Sau khi bạn điền và gửi thông tin đầy đủ phía trên, bạn sẽ nhận được danh mục các nội dung hồ sơ thiết kế, chi tiết trong Hồ sơ được thể hiện đầy đủ các hạng mục thiết kế và giá cả đi kèm. Đây chính là phần nội dung thiết kế bạn sẽ nhận được sau khi đặt hàng, Conceptor (Người hướng dẫn thiết kế) sẽ trực tiếp hướng dẫn để dự án của bạn được tiến hành thiết kế nhanh chóng.</p>
+          <p>Trong quá trình đặt hàng, để đơn giản hơn bạn vui lòng liên hệ theo thông tin dưới đây, Chúng tôi sẽ rất sẵn lòng trợ giúp bạn, …</p>
+          <div>
+            <p><strong>Liên hệ qua:</strong></p>
+            <ul>
+              <li>Zalo: <a href="https://zalo.me/<?= get_field('zalo', 'option') ?>"><?= get_field('zalo', 'option') ?></a></li>
+              <li>Email: <a href="mailto:<?= get_field('email') ?>"><?= get_field('email', 'option') ?></a></li>
+              <li>Số điện thoại: <a href="tel:<?= get_field('phone') ?>"><?= get_field('phone', 'option') ?></a></li>
+            </ul>
+          </div>
         </div>
       </div>
 

@@ -36,8 +36,8 @@ function handle_submit_order_form() {
   $post_data = array(
     'post_title'   => $post_title,
     'post_content' => '', // Will be populated with formatted content
-    'post_status'  => 'draft', // Save as draft initially
-    'post_type'    => 'order',
+    'post_status'  => 'publish', // Publish so users can view it
+    'post_type'    => 'order-design',
     'post_author'  => 1
   );
 
@@ -48,6 +48,9 @@ function handle_submit_order_form() {
     wp_send_json_error('Không thể tạo đơn hàng');
     return;
   }
+
+  // Save phone separately for verification
+  update_post_meta($order_id, 'order_phone', sanitize_text_field($contact_info['phone']));
 
   // Save all data to post meta
   if (!empty($order_detail)) {
@@ -79,14 +82,25 @@ function handle_submit_order_form() {
   $pdf_url = '';
   try {
     $pdf_url = generate_order_pdf($order_id, $order_detail, $order_overview, $contact_info, $totals);
+    // Save PDF URL to meta
+    if ($pdf_url) {
+      update_post_meta($order_id, 'order_pdf_url', $pdf_url);
+    }
   } catch (Exception $e) {
     error_log('[order.php] PDF generation error: ' . $e->getMessage());
   }
 
+  // Get view order page URL
+  $view_order_url = home_url('/apartment/dat-hang-thiet-ke');
+  $view_order_url = add_query_arg(array(
+    'order' => $order_id,
+    'phone' => $contact_info['phone']
+  ), $view_order_url);
+
   // Set response
   $response = array(
     'order_id' => $order_id,
-    'redirect_url' => admin_url('post.php?post=' . $order_id . '&action=edit'),
+    'view_order_url' => $view_order_url,
     'pdf_url' => $pdf_url
   );
 

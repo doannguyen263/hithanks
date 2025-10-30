@@ -87,6 +87,16 @@ if(!function_exists('dntheme_number_format')){
     }
 }
 
+if(!function_exists('dntheme_number_format_v2')){
+    function dntheme_number_format_v2($value,$unit = ' đ',$value_zero = 'text'){
+        if(is_numeric($value)){
+            $value = dntheme_just_number($value);
+            return '<span class="amount" data-price="'.$value.'">'.number_format($value,0,".",".").'<span class="-text">'.$unit.'</span></span>';
+        }
+        return;
+    }
+}
+
 if(!function_exists('dntheme_remove_space')){
     function dntheme_remove_space($string='')
     {
