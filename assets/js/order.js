@@ -740,7 +740,19 @@
     const pond = FilePond.create(input, {
       acceptedFileTypes: ['image/*'],
       allowMultiple: true,
-      maxFiles: 5
+      maxFiles: 5,
+      labelIdle: 'Kéo & thả ảnh vào đây hoặc <span class="filepond--label-action">Chọn ảnh</span>',
+      labelFileProcessing: 'Đang tải lên...',
+      labelFileProcessingComplete: 'Tải lên hoàn tất',
+      labelFileProcessingAborted: 'Đã hủy',
+      labelFileProcessingError: 'Lỗi khi tải lên',
+      labelTapToCancel: 'Nhấn để hủy',
+      labelTapToRetry: 'Nhấn để thử lại',
+      labelTapToUndo: 'Nhấn để hoàn tác',
+      labelButtonRemoveItem: 'Xóa',
+      labelButtonAbortItemProcessing: 'Hủy',
+      labelButtonRetryItemProcessing: 'Thử lại',
+      labelButtonProcessItem: 'Tải lên'
     });
     window.orderPond = pond;
   } else {
