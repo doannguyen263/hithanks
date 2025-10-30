@@ -1,0 +1,9 @@
+# Ignore Composer vendor directory
+/vendor/
+
+# Optional: ignore Composer lock if you don't want to commit it in theme
+# /composer.lock
+
+# Generated files
+/order-pdfs/
+
