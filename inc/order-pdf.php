@@ -103,13 +103,50 @@ function generate_order_pdf_html($order_id, $order_detail, $order_overview, $con
       .total-row { font-weight: bold; font-size: 14px; }
       .grand-total { color: #d63638; font-size: 16px; font-weight: bold; }
       .contact-info { background: #f9f9f9; padding: 10px; border-radius: 4px; }
+
+      /* Added: logo + sketch images grid */
+      .project-logo { text-align: left; margin-bottom: 10px; }
+      .project-logo img { max-height: 70px; height: auto; width: auto; }
+      .image-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+      .image-grid .item { width: 31%; border: 1px solid #eee; padding: 6px; border-radius: 4px; }
+      .image-grid .item img { width: 100%; height: auto; display: block; }
     </style>
   </head>
   <body>
+    <?php
+      // Project logo from ACF option 'logo'
+      if (function_exists('get_field')) {
+        $logo_img = get_field('logo', 'option');
+        if ($logo_img) {
+          $logo_src = wp_get_attachment_image_url($logo_img, 'full');
+          if ($logo_src) {
+            echo '<div class="project-logo"><img src="' . esc_url($logo_src) . '" alt="Logo" /></div>';
+          }
+        }
+      }
+    ?>
     <div class="header">
       <h1>ĐƠN HÀNG THIẾT KẾ</h1>
       <div class="order-info">Mã đơn hàng: #<?php echo $order_id; ?> | Ngày: <?php echo date('d/m/Y H:i'); ?></div>
     </div>
+
+    <?php
+      // First section: Bản vẽ phác thảo (user uploaded images)
+      $attachments = get_post_meta($order_id, '_order_attachments', true);
+      if (!empty($attachments) && is_array($attachments)):
+    ?>
+      <div class="section">
+        <div class="section-title">Bản vẽ phác thảo</div>
+        <div class="image-grid">
+          <?php foreach ($attachments as $att_id):
+            $img_url = wp_get_attachment_image_url($att_id, 'large');
+            if ($img_url): ?>
+              <div class="item"><img src="<?php echo esc_url($img_url); ?>" alt="Sketch" /></div>
+            <?php endif;
+          endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <!-- Contact Information -->
     <div class="section">
@@ -258,4 +295,32 @@ function get_order_pdf_url($order_id) {
   }
   
   return generate_order_pdf($order_id, $order_detail, $order_overview, $contact_info, $totals);
+}
+
+/**
+ * Get or (re)generate HTML preview URL for the order PDF content
+ */
+function get_order_pdf_html_url($order_id) {
+  $order_detail = get_post_meta($order_id, 'order_detail', true);
+  $order_overview = get_post_meta($order_id, 'order_overview', true);
+  $contact_info = get_post_meta($order_id, 'contact_info', true);
+  $totals = get_post_meta($order_id, 'totals', true);
+
+  if (empty($order_id) || empty($contact_info)) {
+    return '';
+  }
+
+  $upload_dir = wp_upload_dir();
+  $pdf_dir = $upload_dir['basedir'] . '/order-pdfs';
+  if (!file_exists($pdf_dir)) {
+    wp_mkdir_p($pdf_dir);
+  }
+  $base = 'order-' . $order_id . '-' . date('Y-m-d');
+  $htmlPath = $pdf_dir . '/' . $base . '.html';
+
+  // Always write latest HTML so bạn xem đúng nội dung mới nhất
+  $html = generate_order_pdf_html($order_id, $order_detail, $order_overview, $contact_info, $totals);
+  file_put_contents($htmlPath, $html);
+
+  return $upload_dir['baseurl'] . '/order-pdfs/' . $base . '.html';
 }
