@@ -103,43 +103,6 @@ get_header(); ?>
           </div>
         </div>
 
-        <!-- Order Detail -->
-        <?php if (!empty($order_detail)): ?>
-        <div class="card mb-4">
-          <div class="card-header">
-            <h3 class="mb-0">Chi tiết thiết kế</h3>
-          </div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Tên sản phẩm</th>
-                  <th class="text-end">Giá tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php 
-                $detail_total = 0;
-                foreach ($order_detail as $item): 
-                  $price = isset($item['price']) ? (int)$item['price'] : 0;
-                  $detail_total += $price;
-                  $name = isset($item['name']) ? $item['name'] : (isset($item['id']) ? $item['id'] : 'N/A');
-                ?>
-                <tr>
-                  <td><?php echo esc_html($name); ?></td>
-                  <td class="text-end"><?php echo number_format($price, 0, ',', '.'); ?> đ</td>
-                </tr>
-                <?php endforeach; ?>
-                <tr class="table-info d-none">
-                  <td><strong>TỔNG CỘNG:</strong></td>
-                  <td class="text-end"><strong><?php echo number_format($detail_total, 0, ',', '.'); ?> đ</strong></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <?php endif; ?>
-
         <!-- Order Overview -->
         <?php if (!empty($order_overview)): ?>
         <div class="card mb-4">
@@ -178,34 +141,6 @@ get_header(); ?>
           </div>
         </div>
         <?php endif; ?>
-
-        <!-- Grand Total -->
-        <?php if (!empty($totals)): ?>
-        <div class="card mb-4">
-          <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">Tổng đơn hàng</h3>
-          </div>
-          <div class="card-body">
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td><strong>Chi tiết thiết kế:</strong></td>
-                  <td class="text-end"><strong><?php echo number_format($totals['order_detail_total'] ?? 0, 0, ',', '.'); ?> đ</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Tổng thể căn hộ:</strong></td>
-                  <td class="text-end"><strong><?php echo number_format($totals['overview_total'] ?? 0, 0, ',', '.'); ?> đ</strong></td>
-                </tr>
-                <tr class="table-danger">
-                  <td><strong>TỔNG CỘNG:</strong></td>
-                  <td class="text-end"><strong style="font-size: 18px;"><?php echo number_format($totals['grand_total'] ?? 0, 0, ',', '.'); ?> đ</strong></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <?php endif; ?>
-
       </div>
     </div>
   </div>

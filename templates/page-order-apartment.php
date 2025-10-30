@@ -133,14 +133,12 @@ while (have_posts()) : the_post();
         <div class="col-md-9">
           <div class="ctf7-making pb-5">
             <div class="entry-content">
-              <?php //echo do_shortcode('[contact-form-7 id="4d93a31" title="Form đặt hàng - APARTMENT"]'); 
-              ?>
               <form id="order-apartment-form" class="order-form">
                 <p><strong>1/3. Ghi chú về căn hộ của bạn</strong></p>
                 <div class="el-box">
                   <p><strong>Tải hình ảnh</strong></p>
                   <p>Bất kỳ bức ảnh hoặc bản vẽ nào cũng sẽ hữu ích, ngay cả khi nó là một nét vẽ phác thảo trên giấy.</p>
-                  <!-- <?= do_shortcode('[mfile upload-file-377 min-file:0 max-file:5]') ?> -->
+                  <input type="file" id="upload" name="image">
                 </div>
                 <div id="order-detail-design" class="el-box js-order-detail-design js-page-order">
                   <div class="row mb-3">
@@ -327,19 +325,13 @@ while (have_posts()) : the_post();
                       </div>
                     </div>
                   </div>
-
                 </div>
-
-
                 <p><strong>3/3. Thông tin liên hệ của bạn</strong></p>
                 <div class="el-box">
                   <p>Sau khi bạn điền và gửi thông tin đầy đủ phía trên, bạn sẽ nhận được danh mục các nội dung hồ sơ thiết kế, chi tiết trong Hồ sơ được thể hiện đầy đủ các hạng mục thiết kế và giá cả đi kèm. Đây chính là phần nội dung thiết kế bạn sẽ nhận được sau khi đặt hàng, Conceptor (Người hướng dẫn thiết kế) sẽ trực tiếp hướng dẫn để dự án của bạn được tiến hành thiết kế nhanh chóng.</p>
                 </div>
-                <div class="position-relative text-end"><button type="submit" class="btn btn-primary">Xem hồ sơ thiết kế của bạn</button></div>
-
+                <div class="position-relative text-end"><button type="submit" class="btn btn-primary me-0">Xem hồ sơ thiết kế của bạn</button></div>
               </form>
-
-
             </div>
           </div>
         </div>

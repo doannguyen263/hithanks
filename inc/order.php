@@ -18,11 +18,11 @@ function handle_submit_order_form() {
     return;
   }
 
-  // Get and sanitize form data
-  $order_detail = isset($_POST['order_detail']) ? $_POST['order_detail'] : [];
-  $order_overview = isset($_POST['order_overview']) ? $_POST['order_overview'] : [];
-  $contact_info = isset($_POST['contact_info']) ? $_POST['contact_info'] : [];
-  $totals = isset($_POST['totals']) ? $_POST['totals'] : [];
+  // Get and sanitize form data (support JSON strings via FormData)
+  $order_detail = isset($_POST['order_detail']) ? dn_maybe_json_decode($_POST['order_detail']) : [];
+  $order_overview = isset($_POST['order_overview']) ? dn_maybe_json_decode($_POST['order_overview']) : [];
+  $contact_info = isset($_POST['contact_info']) ? dn_maybe_json_decode($_POST['contact_info']) : [];
+  $totals = isset($_POST['totals']) ? dn_maybe_json_decode($_POST['totals']) : [];
 
   // Validate required fields
   if (empty($contact_info['name']) || empty($contact_info['phone'])) {
@@ -69,6 +69,54 @@ function handle_submit_order_form() {
     update_post_meta($order_id, 'totals', $totals);
   }
 
+  // Handle file uploads from FilePond (images[]) with max 5 files
+  $attachments = [];
+  if (!empty($_FILES['images'])) {
+    // Count valid files
+    $files = $_FILES['images'];
+    $fileCount = 0;
+    if (is_array($files['name'])) {
+      foreach ($files['name'] as $i => $name) {
+        if (!empty($files['name'][$i]) && $files['error'][$i] === UPLOAD_ERR_OK) {
+          $fileCount++;
+        }
+      }
+    } else if (!empty($files['name']) && $files['error'] === UPLOAD_ERR_OK) {
+      $fileCount = 1;
+    }
+
+    if ($fileCount > 5) {
+      wp_send_json_error('Chỉ được tải lên tối đa 5 ảnh');
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    if (is_array($files['name'])) {
+      foreach ($files['name'] as $i => $name) {
+        if (!empty($files['name'][$i]) && $files['error'][$i] === UPLOAD_ERR_OK) {
+          $file_array = array(
+            'name'     => $files['name'][$i],
+            'type'     => $files['type'][$i],
+            'tmp_name' => $files['tmp_name'][$i],
+            'error'    => $files['error'][$i],
+            'size'     => $files['size'][$i],
+          );
+          $attach_id = media_handle_sideload($file_array, $order_id);
+          if (!is_wp_error($attach_id)) $attachments[] = $attach_id;
+        }
+      }
+    } else {
+      $attach_id = media_handle_upload('images', $order_id);
+      if (!is_wp_error($attach_id)) $attachments[] = $attach_id;
+    }
+
+    if (!empty($attachments)) {
+      update_post_meta($order_id, '_order_attachments', $attachments);
+    }
+  }
+
   // Format and save content
   $formatted_content = format_order_content($order_detail, $order_overview, $contact_info, $totals);
   
@@ -101,10 +149,25 @@ function handle_submit_order_form() {
   $response = array(
     'order_id' => $order_id,
     'view_order_url' => $view_order_url,
-    'pdf_url' => $pdf_url
+    'pdf_url' => $pdf_url,
+    'attachments' => $attachments
   );
 
   wp_send_json_success($response);
+}
+
+/**
+ * Helper: decode JSON string to array if needed
+ */
+function dn_maybe_json_decode($value) {
+  if (is_array($value)) return $value;
+  if (is_string($value)) {
+    $decoded = json_decode(stripslashes($value), true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+      return $decoded;
+    }
+  }
+  return [];
 }
 
 /**

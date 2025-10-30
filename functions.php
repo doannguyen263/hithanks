@@ -174,6 +174,15 @@ function dntheme_scripts() {
     wp_enqueue_script('readmore',get_theme_file_uri('/assets/libs/readmore/readmore.js'), array(), '', true );
 
 
+    wp_enqueue_style('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', array(), '' );
+    wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js', array(), '', true );
+
+    wp_enqueue_style('filepond', 'https://unpkg.com/filepond/dist/filepond.css', array(), '' );
+    wp_enqueue_script('filepond', 'https://unpkg.com/filepond/dist/filepond.js', array(), '', true );
+
+    // SweetAlert2 for nicer alerts
+    wp_enqueue_style('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', array(), '11' );
+    wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', array(), '11', true );
     wp_enqueue_script('dnmain',get_theme_file_uri('/assets/js/main.js'), array(), '', true );
     
     // jQuery Validate from CDN
@@ -228,7 +237,6 @@ require get_parent_theme_file_path( '/inc/template-tags.php' );
 require get_parent_theme_file_path( '/inc/dn-boostspeed.php' );
 require get_parent_theme_file_path( '/inc/dn-helpers.php' );
 require get_parent_theme_file_path( '/inc/woocommerce.php' );
-require get_parent_theme_file_path( '/inc/order.php' );
 require_once get_template_directory() . '/inc/order.php';
 
 /**

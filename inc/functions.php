@@ -73,13 +73,13 @@ function order_post_type()
     $args = array(
         'label'                 => __('Đơn hàng thiết kế', 'dntheme'),
         'labels'                => $labels,
-        'supports'              => array('title', 'thumbnail', 'editor', 'excerpt', 'revisions'),
+        'supports'              => array('title', 'thumbnail', 'editor', 'revisions'),
         'public'                => true,
         'menu_position'         => 10,
         'can_export'            => true,
         'has_archive'           => true,
         'menu_icon' => 'dashicons-category',
-        'rewrite' => array('slug' => 'don-hang-thiet-ke', 'with_front' => false),
+        // 'rewrite' => array('slug' => 'don-hang-thiet-ke', 'with_front' => false),
     );
     register_post_type('order-design', $args);
 

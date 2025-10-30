@@ -23,22 +23,56 @@ function generate_order_pdf($order_id, $order_detail, $order_overview, $contact_
     wp_mkdir_p($pdf_dir);
   }
   
-  // Generate PDF filename
-  $filename = 'order-' . $order_id . '-' . date('Y-m-d') . '.pdf';
-  $filepath = $pdf_dir . '/' . $filename;
+  // Base file names
+  $base = 'order-' . $order_id . '-' . date('Y-m-d');
+  $pdfPath = $pdf_dir . '/' . $base . '.pdf';
+  $htmlPath = $pdf_dir . '/' . $base . '.html';
   
   // Generate HTML content for PDF
   $html = generate_order_pdf_html($order_id, $order_detail, $order_overview, $contact_info, $totals);
   
-  // Save PDF content
-  // Note: You can use mPDF, TCPDF, or any PDF library here
-  // For now, we'll save the HTML and return the path
-  // You'll need to convert HTML to PDF using a library
-  
-  file_put_contents($filepath . '.html', $html);
-  
-  // Return the URL path
-  return $upload_dir['baseurl'] . '/order-pdfs/' . $filename . '.html';
+  // Try to autoload vendor libraries (to enable Dompdf, etc.) if available
+  $autoloads = array(
+    ABSPATH . 'vendor/autoload.php',
+    get_template_directory() . '/vendor/autoload.php',
+  );
+  foreach ($autoloads as $autoload) {
+    if (file_exists($autoload)) {
+      try { require_once $autoload; } catch (\Throwable $e) {}
+    }
+  }
+
+  // Generate and save PDF using mPDF or Dompdf
+  $pdfGenerated = false;
+  if (class_exists('Mpdf\\Mpdf')) {
+    try {
+      $mpdf = new \Mpdf\Mpdf(['tempDir' => $upload_dir['basedir'] . '/mpdf-temp']);
+      $mpdf->WriteHTML($html);
+      $mpdf->Output($pdfPath, \Mpdf\Output\Destination::FILE);
+      $pdfGenerated = true;
+    } catch (\Throwable $e) {
+      error_log('[order-pdf] mPDF error: ' . $e->getMessage());
+    }
+  } elseif (class_exists('Dompdf\\Dompdf')) {
+    try {
+      $dompdf = new \Dompdf\Dompdf();
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'portrait');
+      $dompdf->render();
+      file_put_contents($pdfPath, $dompdf->output());
+      $pdfGenerated = true;
+    } catch (\Throwable $e) {
+      error_log('[order-pdf] Dompdf error: ' . $e->getMessage());
+    }
+  }
+
+  if ($pdfGenerated) {
+    return $upload_dir['baseurl'] . '/order-pdfs/' . $base . '.pdf';
+  }
+
+  // Fallback: save HTML and return .html URL (so it opens correctly)
+  file_put_contents($htmlPath, $html);
+  return $upload_dir['baseurl'] . '/order-pdfs/' . $base . '.html';
 }
 
 /**
