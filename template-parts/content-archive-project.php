@@ -10,7 +10,6 @@
  * @subpackage Dntheme
  * @version 1.0
  */
-$categories = get_the_category();
 
 global $stt;
 ?>
@@ -24,7 +23,7 @@ global $stt;
     <div class="col-7">
       <div class="el-item__meta">
         <h3 class="el-item__title"><a href="<?php the_permalink(); ?>" class="stretched-link"><?php the_title() ?></a></h3>
-        <div class="el-item__excerpt"><?= get_field('sub_title') ?></div>
+        <div class="el-item__excerpt"><?= get_field('sub') ?></div>
       </div>
     </div>
   </div>

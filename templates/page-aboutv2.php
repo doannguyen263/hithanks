@@ -244,12 +244,12 @@ while (have_posts()) : the_post();
     $projectCatID = get_field('project-cat');
 
     $custom_query_args = array(
-      'post_type' => 'project',
+      'post_type' => 'the_moment',
       'posts_per_page' => 9,
       'paged' => $paged,
       'tax_query' => array(
         array(
-          'taxonomy' => 'project_cat',
+          'taxonomy' => 'the_moment_cat',
           'field'    => 'term_id',
           'terms'    => $projectCatID,
         ),
