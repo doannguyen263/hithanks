@@ -465,4 +465,79 @@
       });
     }, delayOffset);
   });
+
+  // Scroll to active nav item on page load
+  $(document).ready(function () {
+    setTimeout(function () {
+      var $navList = $(".js-nav-list");
+      if ($navList.length > 0) {
+        var $activeItem = $navList.find("li.current_page_item");
+        if ($activeItem.length > 0) {
+          // Find scrollable container - check for js-scrollbar first
+          var $scrollContainer = $navList.closest(".js-scrollbar");
+          
+          // If js-scrollbar exists, use it
+          if ($scrollContainer.length > 0) {
+            var $scrollList = $scrollContainer.find(".nav-list");
+            if ($scrollList.length > 0) {
+              var containerWidth = $scrollContainer.width();
+              var listWidth = $scrollList[0].scrollWidth;
+              
+              if (listWidth > containerWidth) {
+                // Calculate scroll position to center active item
+                var activeItemOffset = $activeItem.offset().left - $scrollContainer.offset().left;
+                var activeItemWidth = $activeItem.outerWidth();
+                var currentScrollLeft = $scrollContainer.scrollLeft() || 0;
+                var scrollPosition =
+                  currentScrollLeft +
+                  activeItemOffset +
+                  activeItemWidth / 2 -
+                  containerWidth / 2;
+
+                // Scroll to center the active item
+                $scrollContainer.animate(
+                  {
+                    scrollLeft: Math.max(0, scrollPosition),
+                  },
+                  500
+                );
+              }
+            }
+          } else {
+            // Try to find if nav-list itself or parent is scrollable
+            var $parent = $navList.parent();
+            var containerWidth = $parent.width();
+            var listWidth = $navList[0].scrollWidth || $navList.outerWidth();
+
+            if (listWidth > containerWidth) {
+              // Use scrollIntoView for native scrolling
+              var activeElement = $activeItem[0];
+              if (activeElement && activeElement.scrollIntoView) {
+                activeElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                  inline: "center"
+                });
+              } else {
+                // Fallback: calculate and scroll manually
+                var activeItemOffset = $activeItem.position().left;
+                var activeItemWidth = $activeItem.outerWidth();
+                var scrollPosition =
+                  activeItemOffset +
+                  activeItemWidth / 2 -
+                  containerWidth / 2;
+
+                $parent.animate(
+                  {
+                    scrollLeft: Math.max(0, scrollPosition),
+                  },
+                  500
+                );
+              }
+            }
+          }
+        }
+      }
+    }, 100); // Small delay to ensure DOM is ready
+  });
 })(jQuery);

@@ -9,7 +9,10 @@
  * @subpackage Dntheme
  * @version 1.0
  */
-global $woocommerce;
+$woocommerce_active = class_exists('WooCommerce');
+if ($woocommerce_active) {
+  global $woocommerce;
+}
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -66,7 +69,9 @@ global $woocommerce;
                 </form>
               </div>
             </div>
-            <?php $cart_contents_count = ($woocommerce->cart->cart_contents_count) ? $woocommerce->cart->cart_contents_count : 0; ?>
+            <?php if ($woocommerce_active && function_exists('wc_get_cart_url')): 
+              $cart_contents_count = isset($woocommerce->cart) && $woocommerce->cart ? $woocommerce->cart->cart_contents_count : 0;
+            ?>
             <a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="header__cart" title="<?php _e('View your shopping cart', 'woothemes'); ?>">
               <img src="<?= get_theme_file_uri('assets/img/box.png') ?>" alt="" width="24" height="24" class="ms-4 ms-xl-5">
               <span class="total-cart">
@@ -76,10 +81,11 @@ global $woocommerce;
                 } ?>
               </span>
             </a>
+            <?php endif; ?>
 
-            <?php if (1 == 2): ?>
+            <?php if (1 == 2 && $woocommerce_active && function_exists('wc_get_cart_url')): ?>
               <div class="header-cart ms-4">
-                <?php $cart_contents_count = ($woocommerce->cart->cart_contents_count) ? $woocommerce->cart->cart_contents_count : 0; ?>
+                <?php $cart_contents_count = isset($woocommerce->cart) && $woocommerce->cart ? $woocommerce->cart->cart_contents_count : 0; ?>
                 <a href="<?php echo esc_url(wc_get_cart_url()); ?>" title="<?php _e('View your shopping cart', 'woothemes'); ?>">
 
                   <i class="iconbg-cart" aria-hidden="true"></i><span class="total-cart">

@@ -3,7 +3,7 @@
 
   /**
    * Utility: Format number to VND format
-   * @param {number} price 
+   * @param {number} price
    * @returns {string}
    */
   function formatVND(price) {
@@ -205,13 +205,6 @@
       // Use Math.round to avoid floating point errors
       const result = Math.round(quantity * coefficient * orderDetailTotal);
 
-      console.info('[order.js] calculateItem:', {
-        quantity,
-        coefficient,
-        orderDetailTotal,
-        calculatedResult: result
-      });
-
       // Get display selector
       const displaySelector = this.roomNames[inputName];
       if (displaySelector) {
@@ -235,13 +228,11 @@
         // Get total from displayed element
         const totalText = $orderDetailTotal.text().replace(/\./g, '').replace(' đ', '').trim();
         this.orderDetailBaseTotal = parseInt(totalText, 10) || 0;
-        console.info('[order.js] orderDetailBaseTotal updated from element:', this.orderDetailBaseTotal);
       } else {
         // If element doesn't exist, calculate from checkboxes or use stored value
         const storedTotal = $orderDetailBox.data('calculated-total');
         if (storedTotal !== undefined) {
           this.orderDetailBaseTotal = storedTotal || 0;
-          console.info('[order.js] orderDetailBaseTotal updated from stored value:', this.orderDetailBaseTotal);
         } else {
           // Fallback: calculate directly from checkboxes
           let total = 0;
@@ -252,7 +243,6 @@
             }
           });
           this.orderDetailBaseTotal = total;
-          console.info('[order.js] orderDetailBaseTotal calculated from checkboxes:', this.orderDetailBaseTotal);
         }
       }
 
@@ -297,31 +287,25 @@
    */
   function updateGlobalFormData() {
     if (orderCalculator && overviewCalculator) {
-      // Update order detail data
+      // Update order detail data - collect ALL items (checked and unchecked)
       window.formData.orderDetail.selectedItems = [];
       window.formData.orderDetail.totals = {};
 
-      // Get all checked checkboxes
-      orderCalculator.$checkboxes.filter(':checked').each((index, checkbox) => {
-        const value = $(checkbox).val();
+      // Get ALL checkboxes (both checked and unchecked)
+      orderCalculator.$checkboxes.each((index, checkbox) => {
+        const $checkbox = $(checkbox);
+        const value = $checkbox.val();
         const price = orderCalculator.priceMap[value] || 0;
+        const isChecked = $checkbox.is(':checked');
 
         // Get name from data-name attribute (most reliable)
-        const $checkbox = $(checkbox);
         let name = $checkbox.data('name');
-
-        console.info('[order.js] Extracting name:', {
-          value: value,
-          dataName: name,
-          checkbox: $checkbox[0]
-        });
 
         // Fallback: try to get from DOM if data-name is not available
         if (!name) {
           const $label = $checkbox.closest('label');
           const $nameSpan = $label.find('span.fw-bold');
           name = $nameSpan.text().trim();
-          console.info('[order.js] Fallback - getting from DOM:', { foundSpan: $nameSpan.length, name });
         }
 
         // Final fallback to value if still no name
@@ -333,7 +317,8 @@
           id: value,
           name: name,
           price: price,
-          priceFormatted: formatVND(price)
+          priceFormatted: formatVND(price),
+          checked: isChecked
         });
       });
 
@@ -380,6 +365,14 @@
         }
       });
 
+      // Calculate order detail total (only checked items)
+      let orderDetailTotal = 0;
+      window.formData.orderDetail.selectedItems.forEach(function (item) {
+        if (item.checked) {
+          orderDetailTotal += item.price || 0;
+        }
+      });
+
       // Calculate grand total
       // Logic: overview totals already include quantity * coefficient * order detail total
       // So grand total should ONLY be the sum of overview items, NOT order detail totals
@@ -392,13 +385,15 @@
 
       window.formData.grandTotal = grandTotal;
 
+      // Update order_detail_total in totals (only checked items)
+      window.formData.orderDetail.totals[0] = orderDetailTotal;
+
       // Update total display - only update the total in overview box (#order-detail-overview)
       const $totalDisplay = $('#order-detail-overview .js-order-detail-total-price');
       if ($totalDisplay.length > 0) {
         $totalDisplay.text(formatVND(grandTotal));
       }
 
-      console.info('[order.js] Global form data updated:', window.formData);
     }
   }
 
@@ -407,8 +402,6 @@
   let overviewCalculator = null;
 
   $(document).ready(function () {
-    console.info('[order.js] Order form script loaded');
-
     // Initialize Order Detail Calculator
     orderCalculator = new OrderDetailCalculator();
     window.orderCalculator = orderCalculator;
@@ -423,8 +416,6 @@
     // Check if form exists
     const $form = $('#order-apartment-form');
     if ($form.length > 0) {
-      console.info('[order.js] Form found, attaching submit handler');
-
       // Helper function to show error message
       function showError($input, message) {
         $input.addClass('error');
@@ -504,7 +495,6 @@
         const checkedBoxes = $('input[name="order_detail_items[]"]:checked');
         if (checkedBoxes.length === 0) {
           isValid = false;
-          console.warn('[order.js] Please select at least one design detail');
           if (window.Swal) {
             Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng chọn ít nhất một mục trong Chi tiết thiết kế' });
           } else {
@@ -552,11 +542,9 @@
       // Handle form submission
       $form.on('submit', function (e) {
         e.preventDefault();
-        console.info('[order.js] Form submitted');
 
         // Validate form
         if (!validateForm()) {
-          console.info('[order.js] Form validation failed');
           // Scroll to first error
           const firstError = $('.error').first();
           if (firstError.length) {
@@ -567,11 +555,8 @@
           return false;
         }
 
-        console.info('[order.js] Form validation passed, submitting...');
-
         // Collect all form data
         const formData = collectFormData();
-        console.info('[order.js] Form data collected:', formData);
 
         // Show loading state
         const $button = $form.find('button[type="submit"]');
@@ -583,8 +568,6 @@
 
         return false;
       });
-    } else {
-      console.error('[order.js] Form #order-apartment-form not found!');
     }
   });
 
@@ -606,7 +589,16 @@
         area: $('input[name="your-dientich"]').val()
       },
       totals: {
-        order_detail_total: window.formData.orderDetail.totals[0] || 0,
+        // Calculate order_detail_total from checked items only
+        order_detail_total: (() => {
+          let total = 0;
+          window.formData.orderDetail.selectedItems.forEach(function (item) {
+            if (item.checked) {
+              total += item.price || 0;
+            }
+          });
+          return total;
+        })(),
         overview_total: window.formData.grandTotal,
         grand_total: window.formData.grandTotal
       }
@@ -644,7 +636,6 @@
    * Submit order via AJAX
    */
   function submitOrderAjax(data, $button, originalText) {
-    console.info('[order.js] Submitting data:', data);
 
     // Build FormData to support file uploads
     var formData = new FormData();
@@ -665,7 +656,6 @@
         });
       }
     } catch (e) {
-      console.error('[order.js] Append images error:', e);
     }
 
     $.ajax({
@@ -676,16 +666,12 @@
       processData: false,
       contentType: false,
       success: function (response) {
-        console.info('[order.js] AJAX Success:', response);
-
+        
         if (response.success) {
-          console.info('[order.js] Response data:', response.data);
-
           // Show success via SweetAlert2, then redirect
           var onAfterSuccess = function() {
             if (response.data.view_order_url) {
               window.location.href = response.data.view_order_url;
-              console.info('[order.js] Redirecting to view order page:', response.data.view_order_url);
             }
           };
 
@@ -711,17 +697,12 @@
         }
       },
       error: function (xhr, status, error) {
-        console.error('[order.js] AJAX Error:', error);
-        console.error('[order.js] Response text:', xhr.responseText);
-        console.error('[order.js] Status:', xhr.status);
-
         let errorMsg = 'Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.';
         if (xhr.responseText) {
           try {
             const response = JSON.parse(xhr.responseText);
             errorMsg = response.data || errorMsg;
           } catch (e) {
-            console.error('[order.js] Could not parse error response');
           }
         }
 
@@ -756,6 +737,5 @@
     });
     window.orderPond = pond;
   } else {
-    console.warn('[order.js] #upload input not found');
   }
 })(jQuery);

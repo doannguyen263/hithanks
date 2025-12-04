@@ -183,6 +183,9 @@ strong {
 .cursor-pointer {
 	cursor: pointer;
 }
+.pointer-events-none {
+	pointer-events: none;
+}
 
 .nav__mobile__menu .wpml-ls-item {
 	float: left;
@@ -218,7 +221,7 @@ strong {
 	gap: 4px;
 }
 /**/
-.flickity-prev-next-button { 
+.flickity-prev-next-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1331,6 +1334,7 @@ h1.page-title {
 	margin-bottom: 4px;
 	font-family: 'UTM_AvoBold';
 	font-size: 20px;
+	text-transform: uppercase;
 }
 
 .about-list__title a,
@@ -1499,6 +1503,10 @@ h1.page-title {
 	background: #f4f4f4;
 	padding: 30px;
 	margin-bottom: 1rem;
+	font-size: 15px;
+}
+.ctf7-making .el-box--color {
+	background: #f4f4f4;
 }
 
 .ctf7-making .wpcf7-form .wpcf7-submit {
@@ -3383,6 +3391,7 @@ label.wcva_single_textblock {
 	border-radius: 0 !important;
 }
 
+
 .nav-dieuhuong.is-sticky {
 	position: fixed;
 	top: 0;
@@ -3808,7 +3817,7 @@ text-align: end;
 		height: 36px;
 	}
 
-	
+
 }
 
 /*Small devices (landscape phones, less than 768px)*/
@@ -3942,10 +3951,13 @@ text-align: end;
 		overflow: auto;
 		white-space: nowrap;
 	}
+	.nav-dieuhuong ul.nav-list::-webkit-scrollbar {
+		display: none;
+	}
 
 	.about-heading__title {
 		font-size: 20px;
-		
+
 	}
 	.about-heading__sub {
 		margin-bottom: 10px;
@@ -3955,7 +3967,7 @@ text-align: end;
 		font-size: 15px;
 	}
 
-	
+
 
 	.archive__content .el-item__stt {
 		font-size: 90px;
@@ -4026,4 +4038,14 @@ text-align: end;
 .error:focus {
 	border-color: #dc3545 !important;
 	box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.box-uploadfile {
+	border: 2px dashed;
+}
+.filepond--root .filepond--credits {
+	display: none!important;
+}
+.filepond--root {
+	margin-bottom: 0!important;
 }

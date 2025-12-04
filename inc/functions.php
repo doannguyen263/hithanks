@@ -4,13 +4,13 @@
  * Register Custom Post Type Service
  * @author Đoàn Nguyễn
  */
-function service_post_type()
+function the_moment_post_type()
 {
     $labels = array(
-        'name'                  => _x('Dự án triển khai', 'Dự án triển khai General Name', 'dntheme'),
-        'singular_name'         => _x('Dự án triển khai', 'Dự án triển khai Singular Name', 'dntheme'),
-        'menu_name'             => __('Dự án triển khai', 'dntheme'),
-        'name_admin_bar'        => __('Dự án triển khai', 'dntheme'),
+        'name'                  => _x('The Moment', 'The Moment General Name', 'dntheme'),
+        'singular_name'         => _x('The Moment', 'The Moment Singular Name', 'dntheme'),
+        'menu_name'             => __('The Moment', 'dntheme'),
+        'name_admin_bar'        => __('The Moment', 'dntheme'),
         'add_new_item'          => __('Thêm mới', 'dntheme'),
         'add_new'               => __('Thêm mới', 'dntheme'),
         'new_item'              => __('Thêm', 'dntheme'),
@@ -18,7 +18,7 @@ function service_post_type()
     );
 
     $args = array(
-        'label'                 => __('Dự án triển khai', 'dntheme'),
+        'label'                 => __('The Moment', 'dntheme'),
         'labels'                => $labels,
         'supports'              => array('title', 'thumbnail', 'editor', 'excerpt', 'revisions'),
         'public'                => true,
@@ -26,31 +26,31 @@ function service_post_type()
         'can_export'            => true,
         'has_archive'           => true,
         'menu_icon' => 'dashicons-category',
-        'rewrite' => array('slug' => 'du-an', 'with_front' => false),
+        'rewrite' => array('slug' => 'the-moment', 'with_front' => false),
     );
-    register_post_type('project', $args);
+    register_post_type('the_moment', $args);
 
     $labels = array(
-        'name'              => _x('Danh mục Dự án triển khai', 'Taxonomy General Name', 'dntheme'),
-        'singular_name'     => _x('Danh mục Dự án triển khai', 'Taxonomy Singular Name', 'dntheme'),
+        'name'              => _x('Danh mục The Moment', 'Taxonomy General Name', 'dntheme'),
+        'singular_name'     => _x('Danh mục The Moment', 'Taxonomy Singular Name', 'dntheme'),
         'menu_name'         => __('Danh mục', 'dntheme'),
     );
 
 
     register_taxonomy(
-        'project_cat',
-        'project',
+        'the_moment_cat',
+        'the_moment',
         array(
             'hierarchical' => true,
             'labels' => $labels,
             'show_admin_column' => true,
-            'rewrite' => array('slug' => __('danh-muc-du-an'))
+            'rewrite' => array('slug' => __('danh-muc-the-moment'))
         )
     );
     flush_rewrite_rules();
 }
 
-add_action('init', 'service_post_type', 5);
+add_action('init', 'the_moment_post_type', 5);
 
 
 /**

@@ -59,13 +59,13 @@ while (have_posts()) : the_post();
             $items[0]['class'] = 'current_page_item';
           }
         ?>
-          <ul class="nav-list d-flex justify-content-md-end ms-md-auto">
+          <ul class="nav-list d-flex justify-content-md-end ms-md-auto js-nav-list">
             <?php foreach ($items as $item): ?>
               <li class="<?= $item['class'] ?>"><a href="<?= $item['link'] ?>"><?= $item['title'] ?></a></li>
             <?php endforeach; ?>
           </ul>
         <?php else: ?>
-          <ul class="nav-list d-flex justify-content-md-end ms-md-auto">
+          <ul class="nav-list d-flex justify-content-md-end ms-md-auto js-nav-list">
             <?php echo rt_list_child_pagesv2(); ?>
           </ul>
         <?php endif; ?>

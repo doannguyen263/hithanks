@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Template Name: Page Making Apartment
+ * Template Name: Page Making Townhouses
  *
  * This is the template that displays all pages by default.
  * Please note that this is the WordPress construct of pages
@@ -135,17 +135,15 @@ while (have_posts()) : the_post();
           <div class="ctf7-making pb-5">
             <div class="entry-content">
               <form id="order-apartment-form" class="order-form">
-                <p><strong>1/3. Ghi chú về căn hộ của bạn</strong></p>
-                <div class="el-box">
-                  <p><strong>Thêm hình ảnh</strong></p>
-                  <p>Bất kỳ bức ảnh hoặc bản vẽ nào cũng sẽ hữu ích, ngay cả khi nó là một nét vẽ phác thảo trên giấy.</p>
-                  <div class="box-uploadfile">
-                  <input type="file" id="upload" name="image">
-                  </div>
-                </div>
+                <p><strong>1/3. Ghi chú về căn nhà của bạn</strong></p>
+
                 <div id="order-detail-design" class="el-box js-order-detail-design js-page-order">
-                  <div class="row mb-4">
-                      <strong class="fm-bold h3">1. CHI TIẾT THIẾT KẾ</strong>
+                  <div class="row mb-3">
+                    <div class="col-md-3">
+                      <strong class="fm-bold">1. CHI TIẾT THIẾT KẾ</strong>
+                    </div>
+                    <div class="col-md-9">
+                    </div>
                   </div>
 
                   <div class="mb-3">
@@ -169,12 +167,12 @@ while (have_posts()) : the_post();
                                 $id_menu++;
                                 $name = get_sub_field('name');
                                 $list = get_sub_field('list');
-                                $price = get_sub_field('price');
+                                $price = dntheme_just_number(get_sub_field('price'));
                                 $default_checked = get_sub_field('default_checked');
                             ?>
                                 <div class="row mb-3">
                                   <div class="col-md-9">
-                                    <label class="d-flex align-items-center gap-1 mb-1">
+                                    <label class="d-flex align-items-center gap-1">
                                       <div class="checkbox-wrapper-30">
                                         <span class="checkbox">
                                           <input type="checkbox" name="order_detail_items[]" value="order_detail_item_<?= $id . '-' . $id_menu ?>" data-name="<?= esc_attr($name) ?>" <?= $default_checked ? 'checked' : '' ?> />
@@ -219,15 +217,20 @@ while (have_posts()) : the_post();
                 <div id="order-detail-overview" class="el-box el-box--color js-order-detail-overview js-page-order">
                   <div class="row mb-3">
                     <div class="col-md-3">
-                      <strong class="fm-bold h3">2. TỔNG THỂ CĂN HỘ</strong>
+                      <strong class="fm-bold">2. TỔNG THỂ CĂN NHÀ</strong>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <div class="col-md-3">
+                      <strong class="fw-bold  ms-2">THÔNG TIN CHUNG</strong>
                     </div>
                     <div class="col-md-9">
-
                       <div class="row mb-3">
-                        <div class="col-md-3">
-                          <span>Diện tích</span>
+                        <div class="col-md-4">
+                          <span>Diện tích khu đất</span>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                           <div class="form-group">
                             <input type="number" name="your-dientich" class="form-control" placeholder="Diện tích (m²)" value="100" min="1" step="0.01">
                           </div>
@@ -236,11 +239,41 @@ while (have_posts()) : the_post();
                           <div>m2</div>
                         </div>
                       </div>
+
+                      <div class="row mb-3">
+                        <div class="col-md-4">
+                          <span>Diện tích sàn xây dựng</span>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <input type="number" name="your-dientichsan" class="form-control" placeholder="Diện tích (m²)" value="100" min="1" step="0.01">
+                          </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                          <div>m2</div>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <div class="col-md-4">
+                          <span>Số tầng</span>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <input type="number" name="your-sotang" class="form-control" placeholder="Số tầng" value="1" min="1" step="1">
+                          </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                          <div>tầng</div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
 
                   <div class="row mb-3">
                     <div class="col-md-3">
+                      <strong class="fw-bold  ms-2">HẠNG MỤC</strong>
                     </div>
                     <div class="col-md-9">
                       <?php
@@ -252,10 +285,10 @@ while (have_posts()) : the_post();
                           $coefficient = get_sub_field('coefficient');
                       ?>
                           <div class="row mb-3">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                               <span><?= $name ?></span>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                               <div class="form-group">
                                 <input type="number" name="order_overview_<?= $id ?>" class="form-control" placeholder="<?= $name ?>" data-coefficient="<?= $coefficient ?>" value="" min="0" max="999" step="1">
                               </div>
@@ -267,15 +300,15 @@ while (have_posts()) : the_post();
                       <?php endwhile;
                       endif;
                       ?>
-                      <hr>
-                      <div class="row mb-3">
-                        <div class="col-md-3">
-                          <strong class="fw-bold  ms-2">Tổng cộng</strong>
-                        </div>
-                        <div class="col-md-9 text-end">
-                          <div class="js-order-detail-total-price page-item-price">0</div>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row mb-3">
+                    <div class="col-md-5">
+                      <strong class="fw-bold  ms-2">CHI PHÍ THIẾT KẾ TỔNG THỂ</strong>
+                    </div>
+                    <div class="col-md-7 text-end">
+                      <div class="js-order-detail-total-price page-item-price">0</div>
                     </div>
                   </div>
                 </div>

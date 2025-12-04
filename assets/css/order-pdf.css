@@ -1,0 +1,365 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+div {
+  display: block;
+}
+@font-face {
+  font-family: 'UTM_Avo';
+  src: url('../fonts/UTM_Avo/UTM_Avo.woff2') format('woff2'), url('../fonts/UTM_Avo/UTM_Avo.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UTM_AvoBold';
+  src: url('../fonts/UTM_Avo/UTM_AvoBold.woff2') format('woff2'), url('../fonts/UTM_Avo/UTM_AvoBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+body {
+  font-family: 'UTM_Avo', sans-serif;
+  font-size: 12px;
+  color: #333;
+  padding: 15mm;
+}
+h1, h2, h3, h4, h5, h6, .section-title {
+  display: block;
+  font-family: 'UTM_AvoBold', sans-serif;
+}
+
+/* Page break utilities - Use these classes to control page breaks in PDF */
+/* Force a new page before this element */
+.page-break-before {
+  page-break-before: always;
+}
+
+/* Force a new page after this element */
+.page-break-after {
+  page-break-after: always;
+}
+
+/* Prevent content inside from being split across pages */
+.page-break-inside-avoid {
+  page-break-inside: avoid;
+}
+
+/* Prevent page break after this element */
+.page-break-after-avoid {
+  page-break-after: avoid;
+}
+
+/* Start a new page before and keep content together */
+.page-section {
+  page-break-before: always;
+  page-break-inside: avoid;
+}
+
+/* Keep element on same page */
+.keep-together {
+  page-break-inside: avoid;
+}
+
+/* Logo page - logo at top right corner */
+.logo-image {
+  width: 220px;
+  height: auto;
+}
+.logo-page {
+  width: 100%;
+  margin-bottom: 0;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.logo-container {
+  text-align: right;
+  width: 100%;
+  display: inline-block;
+}
+
+/* Design Order Documents Page */
+.design-order-page {
+  width: 100%;
+  page-break-inside: avoid;
+  box-sizing: border-box;
+  min-height: 0;
+}
+.design-order-title {
+  text-align: right;
+  margin-bottom: 0;
+}
+
+.design-order-title-en {
+  color: #d63638;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  text-align: right;
+}
+
+.design-order-title-vi {
+  color: #333;
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+  text-align: right;
+}
+
+.design-order-details {
+  text-align: right;
+  font-size: 12px;
+  color: #333;
+  page-break-inside: avoid;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  line-height: 22px;
+}
+.design-order-details .detail-item {
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.design-order-details .detail-item strong {
+  font-family: 'UTM_AvoBold', sans-serif;
+}
+/**/
+
+.header {
+  border-bottom: 3px solid #d63638;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.header-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 0;
+}
+
+.header-table td {
+  padding: 0;
+  vertical-align: top;
+  border: 0;
+}
+
+.header h1 {
+  color: #d63638;
+  font-size: 24px;
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+
+.header .order-info {
+  color: #666;
+  font-size: 11px;
+}
+
+.header .header__right img {
+  max-height: 50px;
+  width: auto;
+}
+
+.section {
+  margin-bottom: 25px;
+  page-break-inside: avoid;
+}
+
+.section-title {
+  background: #f0f0f0;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #d63638;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+table th,
+table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background: #f9f9f9;
+  font-weight: bold;
+}
+
+table .text-right {
+  text-align: right;
+}
+
+.total-row {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.grand-total {
+  color: #d63638;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.contact-info {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.uploaded-images-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  page-break-inside: avoid;
+  border: 0;
+}
+
+.uploaded-images-table td {
+  width: 100%;
+  vertical-align: top;
+  padding: 7.5px 0;
+  border: 0;
+}
+
+.uploaded-image-cell {
+  page-break-inside: avoid;
+}
+
+.uploaded-image-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  padding: 10px;
+  page-break-inside: avoid;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.uploaded-image-item img {
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Workflow Page */
+.workflow-page {
+  width: 100%;
+  border-collapse: collapse;
+  page-break-inside: avoid;
+}
+
+.workflow-page td {
+  padding: 0;
+  border: 0;
+}
+
+.workflow-page .workflow-header-left {
+  padding-right: 20px;
+  vertical-align: top;
+}
+
+.workflow-page .workflow-header-right {
+  padding-left: 20px;
+  vertical-align: top;
+  text-align: right;
+}
+
+.workflow-page .workflow-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+  font-family: 'UTM_AvoBold', sans-serif;
+}
+
+.workflow-page .workflow-subtitle {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+  font-weight: normal;
+}
+
+.workflow-divider {
+  width: 100%;
+  height: 2px;
+  background-color: #ddd;
+  margin: 20px 0;
+}
+
+.workflow-divider-cell {
+  display: block;
+  padding: 20px 0;
+}
+
+
+
+.workflow-intro-cell {
+  padding-bottom: 25px;
+}
+.workflow-intro-text {
+  margin: 0;
+  font-size: 12px;
+  color: #333;
+  text-align: left;
+  line-height: 1.6;
+}
+/**/
+.workflow-page .workflow-section-title-cell {
+  width: 150px;
+  padding-right: 20px;
+  vertical-align: top;
+}
+
+.workflow-page .workflow-section-content-cell {
+  vertical-align: top;
+}
+.workflow-page .workflow-section-cell table{
+margin-bottom: 0;
+}
+
+.workflow-page .workflow-section-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  text-transform: uppercase;
+  font-family: 'UTM_AvoBold', sans-serif;
+  text-align: left;
+}
+
+.workflow-page .workflow-subsection-cell {
+  padding-bottom: 20px;
+  vertical-align: top;
+}
+
+.workflow-page .workflow-subsection-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  font-family: 'UTM_AvoBold', sans-serif;
+  text-transform: uppercase;
+  line-height: 22px!important;
+  margin-bottom: 10px!important;
+}
+
+.workflow-page .workflow-subsection-text {
+  font-size: 12px;
+  color: #333;
+  margin: 0;
+  line-height: 1.6;
+  text-align: left;
+}

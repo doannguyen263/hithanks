@@ -10,6 +10,8 @@ require_once get_template_directory() . '/inc/order-pdf.php';
 // Add AJAX action hooks
 add_action('wp_ajax_submit_order_form', 'handle_submit_order_form');
 add_action('wp_ajax_nopriv_submit_order_form', 'handle_submit_order_form');
+add_action('wp_ajax_regenerate_order_pdf', 'handle_regenerate_order_pdf');
+add_action('wp_ajax_nopriv_regenerate_order_pdf', 'handle_regenerate_order_pdf');
 
 function handle_submit_order_form() {
   // Verify nonce
@@ -31,8 +33,8 @@ function handle_submit_order_form() {
   }
 
   // Prepare post data
-  $post_title = 'Đơn hàng từ ' . sanitize_text_field($contact_info['name']) . ' - ' . date('d/m/Y H:i');
-  
+  $post_title = '[Căn hộ chung cư] - từ ' . sanitize_text_field($contact_info['name']) . ' - ' . date('d/m/Y H:i');
+
   $post_data = array(
     'post_title'   => $post_title,
     'post_content' => '', // Will be populated with formatted content
@@ -119,7 +121,7 @@ function handle_submit_order_form() {
 
   // Format and save content
   $formatted_content = format_order_content($order_detail, $order_overview, $contact_info, $totals);
-  
+
   // Update post with formatted content
   wp_update_post(array(
     'ID' => $order_id,
@@ -175,7 +177,7 @@ function dn_maybe_json_decode($value) {
  */
 function format_order_content($order_detail, $order_overview, $contact_info, $totals) {
   $content = '<div class="order-summary">';
-  
+
   // Contact Information
   $content .= '<h3>Thông tin liên hệ</h3>';
   $content .= '<table class="widefat">';
@@ -196,13 +198,18 @@ function format_order_content($order_detail, $order_overview, $contact_info, $to
     $order_total = 0;
     foreach ($order_detail as $item) {
       $price = isset($item['price']) ? (int)$item['price'] : 0;
-      $order_total += $price;
-      
+      $checked = isset($item['checked']) ? (bool)$item['checked'] : true; // Default to checked for backward compatibility
+
+      // Only add to total if checked
+      if ($checked) {
+        $order_total += $price;
+      }
+
       // Get name if available, otherwise use id
       $name = isset($item['name']) ? $item['name'] : (isset($item['id']) ? $item['id'] : 'N/A');
-      
+
       $content .= '<tr>';
-      $content .= '<td>' . esc_html($name) . '</td>';
+      $content .= '<td>' . ($checked ? '✓' : '') . ' ' . esc_html($name) . '</td>';
       $content .= '<td class="text-right">' . number_format($price, 0, ',', '.') . ' đ</td>';
       $content .= '</tr>';
     }
@@ -239,4 +246,60 @@ function format_order_content($order_detail, $order_overview, $contact_info, $to
   $content .= '</div>';
 
   return $content;
+}
+
+/**
+ * Handle regenerate PDF request
+ */
+function handle_regenerate_order_pdf() {
+  // Verify nonce
+  if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'dntheme_nonce')) {
+    wp_send_json_error('Invalid security token');
+    return;
+  }
+
+  // Get order ID
+  $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+  $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
+
+  if (!$order_id) {
+    wp_send_json_error('Order ID is required');
+    return;
+  }
+
+  // Verify phone match for security
+  $order_phone = get_post_meta($order_id, 'order_phone', true);
+  if ($order_phone !== $phone) {
+    wp_send_json_error('Invalid phone number');
+    return;
+  }
+
+  // Get order data
+  $order_detail = get_post_meta($order_id, 'order_detail', true);
+  $order_overview = get_post_meta($order_id, 'order_overview', true);
+  $contact_info = get_post_meta($order_id, 'contact_info', true);
+  $totals = get_post_meta($order_id, 'totals', true);
+
+  if (empty($contact_info)) {
+    wp_send_json_error('Order data not found');
+    return;
+  }
+
+  // Regenerate PDF
+  try {
+    $pdf_url = generate_order_pdf($order_id, $order_detail, $order_overview, $contact_info, $totals);
+
+    // Update PDF URL in meta
+    if ($pdf_url) {
+      update_post_meta($order_id, 'order_pdf_url', $pdf_url);
+    }
+
+    wp_send_json_success(array(
+      'pdf_url' => $pdf_url,
+      'message' => 'PDF đã được tạo lại thành công!'
+    ));
+  } catch (Exception $e) {
+    error_log('[order.php] PDF regeneration error: ' . $e->getMessage());
+    wp_send_json_error('Không thể tạo lại PDF: ' . $e->getMessage());
+  }
 }
