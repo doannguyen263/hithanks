@@ -738,4 +738,68 @@
     window.orderPond = pond;
   } else {
   }
+
+  // Select all items functionality
+  $(document).on('change', '.js-select-all-items', function(e) {
+    e.stopPropagation();
+    const $selectAll = $(this);
+    const groupId = $selectAll.data('group-id');
+    const isChecked = $selectAll.is(':checked');
+    
+    console.info('Select all clicked - Group ID:', groupId, 'Checked:', isChecked);
+    
+    // Find all items in the same group
+    const $items = $('.js-order-detail-item[data-group-id="' + groupId + '"]');
+    console.info('Found items:', $items.length);
+    
+    if ($items.length === 0) {
+      console.info('No items found for group:', groupId);
+      return;
+    }
+    
+    // Check/uncheck all items in the same group
+    $items.each(function() {
+      const $item = $(this);
+      $item.prop('checked', isChecked);
+      
+      // Update visual state for custom checkbox
+      if (isChecked) {
+        $item.closest('.checkbox-wrapper-30').find('.checkbox').addClass('checked');
+      } else {
+        $item.closest('.checkbox-wrapper-30').find('.checkbox').removeClass('checked');
+      }
+    });
+    
+    // Trigger change event on each item to update calculations
+    setTimeout(function() {
+      $items.trigger('change');
+    }, 10);
+  });
+
+  // Update select all checkbox state when individual items change
+  $(document).on('change', '.js-order-detail-item', function() {
+    const $item = $(this);
+    const groupId = $item.data('group-id');
+    const $selectAll = $('.js-select-all-items[data-group-id="' + groupId + '"]');
+    
+    // Count checked items in the same group
+    const totalItems = $('.js-order-detail-item[data-group-id="' + groupId + '"]').length;
+    const checkedItems = $('.js-order-detail-item[data-group-id="' + groupId + '"]:checked').length;
+    
+    // Update select all checkbox state
+    $selectAll.prop('checked', totalItems === checkedItems && totalItems > 0);
+  });
+
+  // Initialize select all checkbox state on page load
+  $(document).ready(function() {
+    $('.js-select-all-items').each(function() {
+      const $selectAll = $(this);
+      const groupId = $selectAll.data('group-id');
+      const totalItems = $('.js-order-detail-item[data-group-id="' + groupId + '"]').length;
+      const checkedItems = $('.js-order-detail-item[data-group-id="' + groupId + '"]:checked').length;
+      
+      // Set initial state
+      $selectAll.prop('checked', totalItems === checkedItems && totalItems > 0);
+    });
+  });
 })(jQuery);
