@@ -110,10 +110,14 @@ get_header(); ?>
                                         <?php
                                         foreach ($bannerSlider as $value) {
                                             $imageID = $value['image'];
+                                            $imageIDPC = $value['image_pc'];
                                         ?>
                                             <div class="carousel-cell">
                                                 <div class="carousel-cell__thumb">
-                                                    <?php echo wp_get_attachment_image($imageID, 'full'); ?>
+                                                    <picture>
+                                                        <source srcset="<?php echo wp_get_attachment_image_url($imageIDPC, 'full'); ?>" media="(min-width: 1200px)">
+                                                        <img src="<?php echo wp_get_attachment_image_url($imageID, 'full'); ?>" alt="<?php echo get_the_title(); ?>">
+                                                    </picture>
                                                 </div>
                                             </div>
                                         <?php

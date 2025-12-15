@@ -41,10 +41,14 @@ get_header(); ?>
                   <?php
                   foreach ($bannerSlider as $value) {
                     $imageID = $value['image'];
+                    $imageIDPC = $value['image_pc'];
                   ?>
                     <div class="carousel-cell">
                       <div class="carousel-cell__thumb">
-                        <?php echo wp_get_attachment_image($imageID, 'full'); ?>
+                        <picture>
+                          <source srcset="<?php echo wp_get_attachment_image_url($imageIDPC, 'full'); ?>" media="(min-width: 1200px)">
+                          <img src="<?php echo wp_get_attachment_image_url($imageID, 'full'); ?>" alt="<?php echo get_the_title(); ?>">
+                        </picture>
                       </div>
                     </div>
                   <?php
@@ -117,8 +121,13 @@ get_header(); ?>
                       $get_sub_sub = get_sub_field('sub');
                       $get_sub_link = get_sub_field('link');
                       $get_sub_color = get_sub_field('color') ? get_sub_field('color') : 'linear-gradient(45deg,#3cb3b1,#71c7c6)';
+                      $get_sub_image = get_sub_field('image');
+                      $get_sub_image_pc = get_sub_field('image_pc');
                     ?>
-                      <li style="background: <?= $get_sub_color ?>;"><a href="<?= $get_sub_link ?>"><?= $get_sub_title ?><p><?= $get_sub_sub ?></p></a></li>
+                      <li
+                      style="--image-url: url('<?php echo $get_sub_image; ?>');--image-url-pc: url('<?php echo $get_sub_image_pc; ?>');
+                      "
+                      ><a href="<?= $get_sub_link ?>"><?= $get_sub_title ?><p><?= $get_sub_sub ?></p></a></li>
                     <?php endwhile; ?>
                   </ul>
                 <?php endif; ?>
@@ -130,6 +139,5 @@ get_header(); ?>
       </div>
     </div>
   <?php endif; ?>
-
 <?php endwhile; ?>
 <?php get_footer();

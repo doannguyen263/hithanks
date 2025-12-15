@@ -400,6 +400,10 @@
   // Initialize both calculators on page load
   let orderCalculator = null;
   let overviewCalculator = null;
+  
+  // Store fresh nonce globally - will be fetched on page load
+  let freshNonce = null;
+  let nonceLoading = false;
 
   $(document).ready(function () {
     // Initialize Order Detail Calculator
@@ -412,6 +416,17 @@
 
     // Initial form data update
     updateGlobalFormData();
+
+    // Fetch fresh nonce immediately on page load
+    if (typeof dntheme_params !== 'undefined' && dntheme_params.dntheme_nonce) {
+      // Use initial nonce as fallback
+      freshNonce = dntheme_params.dntheme_nonce;
+    }
+    
+    // Fetch fresh nonce in background
+    getFreshNonce(function(nonce) {
+      freshNonce = nonce;
+    });
 
     // Check if form exists
     const $form = $('#order-apartment-form');
@@ -543,7 +558,7 @@
       $form.on('submit', function (e) {
         e.preventDefault();
 
-        // Validate form
+        // Validate form first
         if (!validateForm()) {
           // Scroll to first error
           const firstError = $('.error').first();
@@ -555,16 +570,25 @@
           return false;
         }
 
-        // Collect all form data
-        const formData = collectFormData();
-
         // Show loading state
         const $button = $form.find('button[type="submit"]');
         const originalText = $button.html();
         $button.prop('disabled', true).html('Đang xử lý...');
 
-        // Submit via AJAX
-        submitOrderAjax(formData, $button, originalText);
+        // Collect all form data
+        const formData = collectFormData();
+
+        // Use fresh nonce if available, otherwise fetch it
+        if (freshNonce) {
+          // Use cached nonce (already loaded on page load)
+          submitOrderAjax(formData, $button, originalText, freshNonce);
+        } else {
+          // Fallback: fetch nonce if not loaded yet
+          getFreshNonce(function(nonce) {
+            freshNonce = nonce;
+            submitOrderAjax(formData, $button, originalText, nonce);
+          });
+        }
 
         return false;
       });
@@ -573,11 +597,12 @@
 
   /**
    * Collect all form data
+   * Note: nonce will be refreshed before submission, so this is just a placeholder
    */
   function collectFormData() {
     const data = {
       action: 'submit_order_form',
-      nonce: dntheme_params.dntheme_nonce,
+      nonce: dntheme_params.dntheme_nonce, // Will be replaced with fresh nonce before submission
       order_detail: window.formData.orderDetail.selectedItems,
       order_overview: [],
       contact_info: {
@@ -633,87 +658,127 @@
   }
 
   /**
-   * Submit order via AJAX
+   * Get fresh nonce from server
+   * This is needed when using cache plugins like WP Rocket
+   * Uses AJAX endpoint with POST to ensure same user context as form submission
    */
-  function submitOrderAjax(data, $button, originalText) {
-
-    // Build FormData to support file uploads
-    var formData = new FormData();
-    formData.append('action', 'submit_order_form');
-    formData.append('nonce', dntheme_params.dntheme_nonce);
-    formData.append('order_detail', JSON.stringify(data.order_detail));
-    formData.append('order_overview', JSON.stringify(data.order_overview));
-    formData.append('contact_info', JSON.stringify(data.contact_info));
-    formData.append('totals', JSON.stringify(data.totals));
-
-    // Append images from FilePond if available
-    try {
-      if (window.orderPond && typeof window.orderPond.getFiles === 'function') {
-        window.orderPond.getFiles().forEach(function (item) {
-          if (item && item.file) {
-            formData.append('images[]', item.file, item.file.name);
-          }
-        });
-      }
-    } catch (e) {
-    }
-
+  function getFreshNonce(callback) {
     $.ajax({
       url: dntheme_params.ajax_url,
       type: 'POST',
       dataType: 'json',
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (response) {
-        
-        if (response.success) {
-          // Show success via SweetAlert2, then redirect
-          var onAfterSuccess = function() {
-            if (response.data.view_order_url) {
-              window.location.href = response.data.view_order_url;
+      data: {
+        action: 'get_fresh_nonce'
+      },
+      success: function(response) {
+        if (response.success && response.data && response.data.nonce) {
+          // Update global nonce
+          if (typeof dntheme_params !== 'undefined') {
+            dntheme_params.dntheme_nonce = response.data.nonce;
+          }
+          callback(response.data.nonce);
+        } else {
+          // Fallback to original nonce if response format is invalid
+          callback(dntheme_params.dntheme_nonce);
+        }
+      },
+      error: function(xhr, status, error) {
+        // Fallback to original nonce if request fails
+        callback(dntheme_params.dntheme_nonce);
+      }
+    });
+  }
+
+  /**
+   * Submit order via AJAX
+   * @param {Object} data - Form data
+   * @param {jQuery} $button - Submit button element
+   * @param {string} originalText - Original button text
+   * @param {string} freshNonce - Fresh nonce (already fetched)
+   */
+  function submitOrderAjax(data, $button, originalText, freshNonce) {
+    // Build FormData to support file uploads
+    var formData = new FormData();
+    formData.append('action', 'submit_order_form');
+    formData.append('nonce', freshNonce);
+      formData.append('order_detail', JSON.stringify(data.order_detail));
+      formData.append('order_overview', JSON.stringify(data.order_overview));
+      formData.append('contact_info', JSON.stringify(data.contact_info));
+      formData.append('totals', JSON.stringify(data.totals));
+
+      // Append images from FilePond if available
+      try {
+        if (window.orderPond && typeof window.orderPond.getFiles === 'function') {
+          window.orderPond.getFiles().forEach(function (item) {
+            if (item && item.file) {
+              formData.append('images[]', item.file, item.file.name);
             }
-          };
+          });
+        }
+      } catch (e) {
+      }
+
+      $.ajax({
+        url: dntheme_params.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          
+          if (response.success) {
+            // Refresh nonce for next submission (if user stays on page)
+            getFreshNonce(function(nonce) {
+              freshNonce = nonce;
+            });
+            
+            // Show success via SweetAlert2, then redirect
+            var onAfterSuccess = function() {
+              if (response.data.view_order_url) {
+                window.location.href = response.data.view_order_url;
+              }
+            };
+
+            if (window.Swal) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: 'Đơn hàng của bạn đã được gửi thành công! Mã đơn hàng: ' + response.data.order_id,
+                confirmButtonText: 'OK'
+              }).then(onAfterSuccess);
+            } else {
+              alert('Đơn hàng của bạn đã được gửi thành công! Mã đơn hàng: ' + response.data.order_id);
+              onAfterSuccess();
+            }
+          } else {
+            // Show error message
+            if (window.Swal) {
+              Swal.fire({ icon: 'error', title: 'Có lỗi xảy ra', text: (response.data || 'Vui lòng thử lại') });
+            } else {
+              alert('Có lỗi xảy ra: ' + (response.data || 'Vui lòng thử lại'));
+            }
+            $button.prop('disabled', false).html(originalText);
+          }
+        },
+        error: function (xhr, status, error) {
+          let errorMsg = 'Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.';
+          if (xhr.responseText) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              errorMsg = response.data || errorMsg;
+            } catch (e) {
+            }
+          }
 
           if (window.Swal) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Thành công',
-              text: 'Đơn hàng của bạn đã được gửi thành công! Mã đơn hàng: ' + response.data.order_id,
-              confirmButtonText: 'OK'
-            }).then(onAfterSuccess);
+            Swal.fire({ icon: 'error', title: 'Có lỗi xảy ra', text: errorMsg });
           } else {
-            alert('Đơn hàng của bạn đã được gửi thành công! Mã đơn hàng: ' + response.data.order_id);
-            onAfterSuccess();
-          }
-        } else {
-          // Show error message
-          if (window.Swal) {
-            Swal.fire({ icon: 'error', title: 'Có lỗi xảy ra', text: (response.data || 'Vui lòng thử lại') });
-          } else {
-            alert('Có lỗi xảy ra: ' + (response.data || 'Vui lòng thử lại'));
+            alert(errorMsg);
           }
           $button.prop('disabled', false).html(originalText);
         }
-      },
-      error: function (xhr, status, error) {
-        let errorMsg = 'Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.';
-        if (xhr.responseText) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            errorMsg = response.data || errorMsg;
-          } catch (e) {
-          }
-        }
-
-        if (window.Swal) {
-          Swal.fire({ icon: 'error', title: 'Có lỗi xảy ra', text: errorMsg });
-        } else {
-          alert(errorMsg);
-        }
-        $button.prop('disabled', false).html(originalText);
-      }
-    });
+      });
   }
 
   const input = document.querySelector('#upload');

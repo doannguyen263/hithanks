@@ -192,7 +192,7 @@ function dntheme_scripts() {
     wp_enqueue_script('dnorder',get_theme_file_uri('/assets/js/order.js'), array('jquery', 'jquery-validate'), '', true );
 
     // Theme stylesheet.
-    wp_enqueue_style( 'dn-style', get_stylesheet_uri() );
+    wp_enqueue_style( 'dn-style', get_stylesheet_uri(), array(), filemtime( get_stylesheet_directory() . '/style.css' ) );
 
     // Call defaul js
     wp_localize_script( 'dnmain', 'dntheme_params', array(
@@ -202,9 +202,12 @@ function dntheme_scripts() {
     );
 
     // Localize order.js
+    // Build REST API URL manually to ensure it's available
+    $rest_url = home_url( '/wp-json/dntheme/v1/nonce' );
     wp_localize_script( 'dnorder', 'dntheme_params', array(
         'dntheme_nonce' => wp_create_nonce( 'dntheme_nonce' ),
         'ajax_url' => admin_url( 'admin-ajax.php' ),
+        'rest_url' => esc_url_raw( $rest_url ),
         )
     );
 

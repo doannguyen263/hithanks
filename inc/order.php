@@ -12,11 +12,40 @@ add_action('wp_ajax_submit_order_form', 'handle_submit_order_form');
 add_action('wp_ajax_nopriv_submit_order_form', 'handle_submit_order_form');
 add_action('wp_ajax_regenerate_order_pdf', 'handle_regenerate_order_pdf');
 add_action('wp_ajax_nopriv_regenerate_order_pdf', 'handle_regenerate_order_pdf');
+add_action('wp_ajax_get_fresh_nonce', 'handle_get_fresh_nonce');
+add_action('wp_ajax_nopriv_get_fresh_nonce', 'handle_get_fresh_nonce');
+
+// Register REST API endpoint for getting fresh nonce (supports GET method)
+// Register early to ensure it's available when scripts are enqueued
+add_action('rest_api_init', function() {
+  register_rest_route('dntheme/v1', '/nonce', array(
+    'methods' => 'GET',
+    'callback' => 'handle_get_fresh_nonce_rest',
+    'permission_callback' => '__return_true' // Public endpoint
+  ));
+}, 10);
 
 function handle_submit_order_form() {
   // Verify nonce
-  if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'dntheme_nonce')) {
-    wp_send_json_error('Invalid security token');
+  $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+  $current_user_id = get_current_user_id();
+  
+  // Try to verify nonce
+  $verified = wp_verify_nonce($nonce, 'dntheme_nonce');
+  
+  if (!$verified) {
+    // For debugging: try to understand why nonce failed
+    // Check if nonce is valid for user 0 (public/unauthenticated)
+    $nonce_user_0 = wp_create_nonce('dntheme_nonce');
+    $is_same_as_new = ($nonce === $nonce_user_0);
+    
+    error_log('[Order Form] Nonce verification failed.');
+    error_log('[Order Form] Current User ID: ' . $current_user_id);
+    error_log('[Order Form] Nonce received: ' . substr($nonce, 0, 10) . '...');
+    error_log('[Order Form] New nonce for user ' . $current_user_id . ': ' . substr($nonce_user_0, 0, 10) . '...');
+    error_log('[Order Form] Nonces match: ' . ($is_same_as_new ? 'Yes' : 'No'));
+    
+    wp_send_json_error('Invalid security token. Please refresh the page and try again.');
     return;
   }
 
@@ -246,6 +275,43 @@ function format_order_content($order_detail, $order_overview, $contact_info, $to
   $content .= '</div>';
 
   return $content;
+}
+
+/**
+ * Handle get fresh nonce request (AJAX)
+ * This endpoint returns a fresh nonce to avoid cache issues
+ */
+function handle_get_fresh_nonce() {
+  // No nonce verification needed for this endpoint as it's used to GET a nonce
+  wp_send_json_success(array(
+    'nonce' => wp_create_nonce('dntheme_nonce')
+  ));
+}
+
+/**
+ * Handle get fresh nonce request (REST API)
+ * This endpoint returns a fresh nonce to avoid cache issues
+ * Supports GET method properly
+ * 
+ * Important: For public forms, we need to ensure nonce is created for user 0
+ * (unauthenticated users) to match the verification context
+ */
+function handle_get_fresh_nonce_rest($request) {
+  // Ensure we're in the correct user context for public endpoints
+  // For nopriv requests, user ID should be 0
+  $current_user_id = get_current_user_id();
+  
+  // Create nonce - wp_create_nonce uses current user ID
+  // For public forms, this should be 0 (unauthenticated)
+  $nonce = wp_create_nonce('dntheme_nonce');
+  
+  return new WP_REST_Response(array(
+    'success' => true,
+    'data' => array(
+      'nonce' => $nonce,
+      'user_id' => $current_user_id // For debugging
+    )
+  ), 200);
 }
 
 /**

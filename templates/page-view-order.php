@@ -226,6 +226,42 @@ get_header(); ?>
 
 <script>
 (function($) {
+  /**
+   * Get fresh nonce from server
+   * This is needed when using cache plugins like WP Rocket
+   * Uses REST API endpoint which properly supports GET method
+   */
+  function getFreshNonce(callback) {
+    // Check if REST API URL is available
+    if (!dntheme_params.rest_url) {
+      // If REST API URL not available, use original nonce
+      callback(dntheme_params.dntheme_nonce);
+      return;
+    }
+
+    $.ajax({
+      url: dntheme_params.rest_url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        if (response.success && response.data && response.data.nonce) {
+          // Update global nonce
+          if (typeof dntheme_params !== 'undefined') {
+            dntheme_params.dntheme_nonce = response.data.nonce;
+          }
+          callback(response.data.nonce);
+        } else {
+          // Fallback to original nonce if response format is invalid
+          callback(dntheme_params.dntheme_nonce);
+        }
+      },
+      error: function() {
+        // Fallback to original nonce if REST API request fails
+        callback(dntheme_params.dntheme_nonce);
+      }
+    });
+  }
+
   $('#regenerate-pdf-btn').on('click', function() {
     const $button = $(this);
     const orderId = $button.data('order-id');
@@ -235,60 +271,63 @@ get_header(); ?>
     // Disable button and show loading
     $button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tạo lại PDF...');
 
-    $.ajax({
-      url: dntheme_params.ajax_url,
-      type: 'POST',
-      dataType: 'json',
-      data: {
-        action: 'regenerate_order_pdf',
-        nonce: dntheme_params.dntheme_nonce,
-        order_id: orderId,
-        phone: phone
-      },
-      success: function(response) {
-        if (response.success) {
-          // Show success message
-          if (window.Swal) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Thành công',
-              text: response.data.message || 'PDF đã được tạo lại thành công!',
-              confirmButtonText: 'OK'
-            }).then(function() {
-              // Reload page to show new PDF URL
+    // Get fresh nonce before submitting to avoid cache issues
+    getFreshNonce(function(freshNonce) {
+      $.ajax({
+        url: dntheme_params.ajax_url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          action: 'regenerate_order_pdf',
+          nonce: freshNonce,
+          order_id: orderId,
+          phone: phone
+        },
+        success: function(response) {
+          if (response.success) {
+            // Show success message
+            if (window.Swal) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: response.data.message || 'PDF đã được tạo lại thành công!',
+                confirmButtonText: 'OK'
+              }).then(function() {
+                // Reload page to show new PDF URL
+                location.reload();
+              });
+            } else {
+              alert(response.data.message || 'PDF đã được tạo lại thành công!');
               location.reload();
-            });
+            }
           } else {
-            alert(response.data.message || 'PDF đã được tạo lại thành công!');
-            location.reload();
+            // Show error
+            if (window.Swal) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Có lỗi xảy ra',
+                text: response.data || 'Không thể tạo lại PDF'
+              });
+            } else {
+              alert('Có lỗi xảy ra: ' + (response.data || 'Không thể tạo lại PDF'));
+            }
+            $button.prop('disabled', false).html(originalText);
           }
-        } else {
-          // Show error
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
           if (window.Swal) {
             Swal.fire({
               icon: 'error',
               title: 'Có lỗi xảy ra',
-              text: response.data || 'Không thể tạo lại PDF'
+              text: 'Không thể kết nối đến server. Vui lòng thử lại.'
             });
           } else {
-            alert('Có lỗi xảy ra: ' + (response.data || 'Không thể tạo lại PDF'));
+            alert('Có lỗi xảy ra: Không thể kết nối đến server. Vui lòng thử lại.');
           }
           $button.prop('disabled', false).html(originalText);
         }
-      },
-      error: function(xhr, status, error) {
-        console.error('AJAX Error:', error);
-        if (window.Swal) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Có lỗi xảy ra',
-            text: 'Không thể kết nối đến server. Vui lòng thử lại.'
-          });
-        } else {
-          alert('Có lỗi xảy ra: Không thể kết nối đến server. Vui lòng thử lại.');
-        }
-        $button.prop('disabled', false).html(originalText);
-      }
+      });
     });
   });
 })(jQuery);
