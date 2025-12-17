@@ -179,6 +179,7 @@ function dntheme_scripts() {
 
     wp_enqueue_style('filepond', 'https://unpkg.com/filepond/dist/filepond.css', array(), '' );
     wp_enqueue_script('filepond', 'https://unpkg.com/filepond/dist/filepond.js', array(), '', true );
+    wp_enqueue_script('filepond-file-validate-type', 'https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js', array('filepond'), '', true );
 
     // SweetAlert2 for nicer alerts
     wp_enqueue_style('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css', array(), '11' );

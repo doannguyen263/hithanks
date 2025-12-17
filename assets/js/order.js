@@ -400,10 +400,6 @@
   // Initialize both calculators on page load
   let orderCalculator = null;
   let overviewCalculator = null;
-  
-  // Store fresh nonce globally - will be fetched on page load
-  let freshNonce = null;
-  let nonceLoading = false;
 
   $(document).ready(function () {
     // Initialize Order Detail Calculator
@@ -416,17 +412,6 @@
 
     // Initial form data update
     updateGlobalFormData();
-
-    // Fetch fresh nonce immediately on page load
-    if (typeof dntheme_params !== 'undefined' && dntheme_params.dntheme_nonce) {
-      // Use initial nonce as fallback
-      freshNonce = dntheme_params.dntheme_nonce;
-    }
-    
-    // Fetch fresh nonce in background
-    getFreshNonce(function(nonce) {
-      freshNonce = nonce;
-    });
 
     // Check if form exists
     const $form = $('#order-apartment-form');
@@ -558,7 +543,7 @@
       $form.on('submit', function (e) {
         e.preventDefault();
 
-        // Validate form first
+        // Validate form
         if (!validateForm()) {
           // Scroll to first error
           const firstError = $('.error').first();
@@ -570,25 +555,16 @@
           return false;
         }
 
+        // Collect all form data
+        const formData = collectFormData();
+
         // Show loading state
         const $button = $form.find('button[type="submit"]');
         const originalText = $button.html();
         $button.prop('disabled', true).html('Đang xử lý...');
 
-        // Collect all form data
-        const formData = collectFormData();
-
-        // Use fresh nonce if available, otherwise fetch it
-        if (freshNonce) {
-          // Use cached nonce (already loaded on page load)
-          submitOrderAjax(formData, $button, originalText, freshNonce);
-        } else {
-          // Fallback: fetch nonce if not loaded yet
-          getFreshNonce(function(nonce) {
-            freshNonce = nonce;
-            submitOrderAjax(formData, $button, originalText, nonce);
-          });
-        }
+        // Submit via AJAX
+        submitOrderAjax(formData, $button, originalText);
 
         return false;
       });
@@ -663,6 +639,8 @@
    * Uses AJAX endpoint with POST to ensure same user context as form submission
    */
   function getFreshNonce(callback) {
+    console.log('Fetching fresh nonce via AJAX...');
+    
     $.ajax({
       url: dntheme_params.ajax_url,
       type: 'POST',
@@ -671,18 +649,22 @@
         action: 'get_fresh_nonce'
       },
       success: function(response) {
+        console.log('Fresh nonce response:', response);
         if (response.success && response.data && response.data.nonce) {
           // Update global nonce
           if (typeof dntheme_params !== 'undefined') {
             dntheme_params.dntheme_nonce = response.data.nonce;
           }
+          console.log('Using fresh nonce');
           callback(response.data.nonce);
         } else {
+          console.warn('Invalid response format, using cached nonce');
           // Fallback to original nonce if response format is invalid
           callback(dntheme_params.dntheme_nonce);
         }
       },
       error: function(xhr, status, error) {
+        console.error('Failed to fetch fresh nonce:', error, xhr);
         // Fallback to original nonce if request fails
         callback(dntheme_params.dntheme_nonce);
       }
@@ -691,16 +673,21 @@
 
   /**
    * Submit order via AJAX
-   * @param {Object} data - Form data
-   * @param {jQuery} $button - Submit button element
-   * @param {string} originalText - Original button text
-   * @param {string} freshNonce - Fresh nonce (already fetched)
    */
-  function submitOrderAjax(data, $button, originalText, freshNonce) {
-    // Build FormData to support file uploads
-    var formData = new FormData();
-    formData.append('action', 'submit_order_form');
-    formData.append('nonce', freshNonce);
+  function submitOrderAjax(data, $button, originalText) {
+    console.log('Submitting order, getting fresh nonce...');
+    // Get fresh nonce before submitting to avoid cache issues
+    getFreshNonce(function(freshNonce) {
+      console.log('Got nonce, submitting form with nonce:', freshNonce ? freshNonce.substring(0, 10) + '...' : 'empty');
+      console.log('Full nonce length:', freshNonce ? freshNonce.length : 0);
+      
+      // Build FormData to support file uploads
+      var formData = new FormData();
+      formData.append('action', 'submit_order_form');
+      formData.append('nonce', freshNonce);
+      
+      // Debug: Verify nonce is in FormData
+      console.log('FormData nonce check:', formData.get('nonce') ? formData.get('nonce').substring(0, 10) + '...' : 'not found');
       formData.append('order_detail', JSON.stringify(data.order_detail));
       formData.append('order_overview', JSON.stringify(data.order_overview));
       formData.append('contact_info', JSON.stringify(data.contact_info));
@@ -728,11 +715,6 @@
         success: function (response) {
           
           if (response.success) {
-            // Refresh nonce for next submission (if user stays on page)
-            getFreshNonce(function(nonce) {
-              freshNonce = nonce;
-            });
-            
             // Show success via SweetAlert2, then redirect
             var onAfterSuccess = function() {
               if (response.data.view_order_url) {
@@ -779,14 +761,25 @@
           $button.prop('disabled', false).html(originalText);
         }
       });
+    });
   }
 
   const input = document.querySelector('#upload');
   if (input) {
+    // Register File Validate Type plugin
+    if (typeof FilePondPluginFileValidateType !== 'undefined') {
+      FilePond.registerPlugin(FilePondPluginFileValidateType);
+    }
+    
     const pond = FilePond.create(input, {
-      acceptedFileTypes: ['image/*'],
+      acceptedFileTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'],
+      allowFileTypeValidation: true,
       allowMultiple: true,
       maxFiles: 5,
+      maxFileSize: '5MB',
+      labelMaxFileSize: 'File quá lớn, dung lượng tối đa là {filesize}',
+      labelMaxFileSizeExceeded: 'File quá lớn',
+      labelFileTypeNotAllowed: 'Chỉ cho phép tải lên file ảnh (JPG, PNG, GIF, WEBP)',
       labelIdle: 'Kéo & thả ảnh vào đây hoặc <span class="filepond--label-action">Chọn ảnh</span>',
       labelFileProcessing: 'Đang tải lên...',
       labelFileProcessingComplete: 'Tải lên hoàn tất',
@@ -801,9 +794,7 @@
       labelButtonProcessItem: 'Tải lên'
     });
     window.orderPond = pond;
-  } else {
   }
-
   // Select all items functionality
   $(document).on('change', '.js-select-all-items', function(e) {
     e.stopPropagation();

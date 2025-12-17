@@ -17,8 +17,8 @@ $categories = get_categories(
 
 
 if( $term_parent ){
-  $title_parent = get_term_by('id', $term_parent, 'category');
-  $title_parent = $title_parent->name;
+  $term_parent_object = get_term_by('id', $term_parent, 'category');
+  $title_parent = $term_parent_object->name;
   $lienket_danhmuc = get_field('lienket_danhmuc','category_'.$term_parent);
 
 }else{
@@ -26,7 +26,6 @@ if( $term_parent ){
   $lienket_danhmuc = get_field('lienket_danhmuc',$term);
 
 }
-
 ?>
 
 <div class="nav-dieuhuong" data-toggle="sticky-onscroll">
@@ -35,6 +34,10 @@ if( $term_parent ){
     <div class="d-md-flex align-items-center">
       <div class="nav-dieuhuong__title back-to-top"><?= $title_parent ?></div>
       <ul class="nav-list d-flex justify-content-md-end ms-md-auto">
+        <?php
+        if( $term_parent ): ?>
+          <li><a href="<?= get_term_link($term_parent) ?>"><?= $title_parent ?></a></li>
+        <?php endif; ?>
         <?php if( $categories ):
 
           foreach ($categories as $item) {

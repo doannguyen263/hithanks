@@ -187,6 +187,10 @@ strong {
 	pointer-events: none;
 }
 
+.ratio>* {
+	object-fit: cover;
+}
+
 .nav__mobile__menu .wpml-ls-item {
 	float: left;
 	margin-right: 4px;
@@ -1024,11 +1028,9 @@ body:not(.home).header {
 }
 
 .home-nav .card .card-text {
-	text-align: justify;
 	font-size: 17px;
 }
 
-/* .home-nav__item:not(.active):hover {transform:scale(.98);} */
 .home-nav__item.style3 .card::before {
 	content: "";
 	position: absolute;
