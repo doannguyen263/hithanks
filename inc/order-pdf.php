@@ -79,7 +79,13 @@ function generate_order_pdf($order_id, $order_detail, $order_overview, $contact_
       render_order_pdf_header_section($order_id, $logo);
       render_order_pdf_contact_info($contact_info);
       render_order_pdf_uploaded_images($order_id);
+      $mpdf->WriteHTML(ob_get_clean());
+      $mpdf->AddPage();
+      ob_start();
       render_order_pdf_order_detail($order_detail);
+      $mpdf->WriteHTML(ob_get_clean());
+      $mpdf->AddPage();
+      ob_start();
       render_order_pdf_order_overview($order_overview);
       render_order_pdf_grand_total($totals);
       render_order_pdf_footer();
@@ -264,7 +270,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr style="border:0;">
-                    <td class="workflow-subsection-title" style="padding: 0;">CONCEPT DESIGN:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">CONCEPT DESIGN</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">
@@ -278,7 +284,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 10px 0 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">PRODUCT DESIGN:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">PRODUCT DESIGN</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">
@@ -292,7 +298,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 10px 0 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">TECHNICAL DESIGN:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">TECHNICAL DESIGN</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">
@@ -318,7 +324,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding: 0;">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">BUILD:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">BUILD</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">Tổ chức thi công tại công trình các hạng mục xây dựng theo Hồ sơ thiết kế kỹ thuật</td>
@@ -330,7 +336,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 10px 0 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">PRODUCT SUPPLY:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">PRODUCT SUPPLY</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">Quản lý, cung cấp và lắp đặt sản phẩm theo Hồ sơ thiết kế sản phẩm</td>
@@ -354,7 +360,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">TAKE CARE:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">TAKE CARE</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">Hướng dẫn sử dụng, bảo trì, bảo dưỡng sản phẩm</td>
@@ -366,7 +372,7 @@ function render_order_pdf_workflow_page($logo)
               <td class="workflow-subsection-cell" style="padding: 10px 0 0;">
                 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
                   <tr style="border:0">
-                    <td class="workflow-subsection-title" style="padding: 0;">MAINTENANCE:</td>
+                    <td class="workflow-subsection-title" style="padding: 0;">MAINTENANCE</td>
                   </tr>
                   <tr style="border:0">
                     <td class="workflow-subsection-text" style="padding: 6px 0 0 0;">Kiểm tra định kỳ, thay thế và sửa chữa sản phẩm hư hỏng trong quá trình sử dụng</td>
@@ -414,29 +420,39 @@ function render_order_pdf_contact_info($contact_info)
     <div class="section">
       <div class="section-title">THÔNG TIN LIÊN HỆ</div>
       <table>
+        <?php if (!empty($contact_info['name'])): ?>  
         <tr>
-          <td style="width: 30%;"><strong>Tên khách hàng:</strong></td>
+          <td style="width: 30%;"><strong>Tên khách hàng</strong></td>
           <td><?php echo esc_html($contact_info['name']); ?></td>
         </tr>
+        <?php endif; ?>
+        <?php if (!empty($contact_info['phone'])): ?>
+          <tr>
+            <td><strong>Số điện thoại</strong></td>
+            <td><?php echo esc_html($contact_info['phone']); ?></td>
+          </tr>
+        <?php endif; ?>
+        <?php if (!empty($contact_info['address'])): ?>
         <tr>
-          <td><strong>Số điện thoại:</strong></td>
-          <td><?php echo esc_html($contact_info['phone']); ?></td>
-        </tr>
-        <tr>
-          <td><strong>Địa chỉ:</strong></td>
+          <td><strong>Địa chỉ</strong></td>
           <td><?php echo esc_html($contact_info['address']); ?></td>
         </tr>
+        <?php endif; ?>
+        <?php if (!empty($contact_info['address_project'])): ?>
         <tr>
-          <td><strong>Địa chỉ dự án:</strong></td>
-          <td><?php echo esc_html($contact_info['address_project']); ?></td>
-        </tr>
-        <tr>
-          <td><strong>Diện tích:</strong></td>
-          <td><?php echo esc_html($contact_info['area']); ?> m²</td>
-        </tr>
+          <td><strong>Địa chỉ dự án</strong></td>
+            <td><?php echo esc_html($contact_info['address_project']); ?></td>
+          </tr>
+        <?php endif; ?>
+        <?php if (!empty($contact_info['area'])): ?>
+          <tr>
+            <td><strong>Diện tích</strong></td>
+            <td><?php echo esc_html($contact_info['area']); ?> m²</td>
+          </tr>
+        <?php endif; ?>
         <?php if (!empty($contact_info['note'])): ?>
           <tr>
-            <td><strong>Ghi chú:</strong></td>
+            <td><strong>Ghi chú</strong></td>
             <td><?php echo esc_html($contact_info['note']); ?></td>
           </tr>
         <?php endif; ?>
@@ -675,7 +691,7 @@ function render_order_pdf_order_detail($order_detail)
             <!-- https://www.flaticon.com/free-icon/check-box_9258207?term=check&related_id=9222555&origin=tag -->
             <tr>
               <td>
-                <div style="font-weight: bold;"><?php echo esc_html($name); ?></div>
+                <div style="font-weight: bold;padding-bottom: 8px;"><?php echo esc_html($name); ?></div>
                 <?php if (!empty($subitems)): ?>
                   <div style="padding-left: 20px; padding-top: 8px;">
                     <?php foreach ($subitems as $subitem): ?>
@@ -739,7 +755,7 @@ function render_order_pdf_order_overview($order_overview)
             </tr>
           <?php endforeach; ?>
           <tr class="total-row">
-            <td colspan="2"><strong>TỔNG CỘNG TỔNG THỂ CĂN HỘ:</strong></td>
+            <td colspan="2"><strong>TỔNG CỘNG TỔNG THỂ CĂN HỘ</strong></td>
             <td class="text-right"><strong><?php echo number_format($overview_total, 0, ',', '.'); ?> đ</strong></td>
           </tr>
         </tbody>
@@ -770,7 +786,7 @@ function render_order_pdf_grand_total($totals)
         <td class="text-right"><strong><?php echo number_format($totals['overview_total'], 0, ',', '.'); ?> đ</strong></td>
       </tr> -->
         <tr class="grand-total">
-          <td style="padding-top: 15px; border-top: 2px solid #d63638;">TỔNG CỘNG:</td>
+          <td style="padding-top: 15px; border-top: 2px solid #d63638;">TỔNG CỘNG</td>
           <td class="text-right" style="padding-top: 15px; border-top: 2px solid #d63638;">
             <span style="font-size: 18px; color: #d63638;"><?php echo number_format($totals['grand_total'], 0, ',', '.'); ?> đ</span>
           </td>

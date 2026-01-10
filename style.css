@@ -1793,12 +1793,12 @@ a.product__call.--addProduct {
 }
 
 .archive__content .el-item__meta {
-	padding: 40px 0;
+	padding: 0 0;
 }
 
 .archive__content .el-item:not(:last-child) {
 	border-bottom: 1px solid #ccc;
-	padding-bottom: 2rem;
+	padding-bottom: 1rem;
 }
 
 .archive__content .el-item__title {
@@ -3995,7 +3995,7 @@ text-align: end;
 	}
 
 	.archive__content .el-item__meta {
-		padding: 4px 0 0;
+		padding: 0 0;
 		font-size: 14px;
 	}
 

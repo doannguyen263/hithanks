@@ -77,7 +77,7 @@ if( $term_parent ){
     $get_title = get_field('title',$term);
     $get_sub = get_field('sub',$term);
     ?>
-    <div class="about-heading text-white">
+    <div class="about-heading text-white d-none d-xl-flex">
       <?php if($get_title): ?>
       <h1 class="about-heading__title"><?php echo $get_title;?></h1>
       <div class="about-heading__sub h2"><?php echo $get_sub;?></div>
@@ -85,7 +85,7 @@ if( $term_parent ){
         <h1 class="about-heading__title"><?php echo single_term_title( '', false );?></h1>
       <?php endif; ?>
     </div>
-    <hr>
+    <hr class="d-none d-xl-block">
 
     <div class="archive__content mb-5">
       <?php

@@ -226,23 +226,22 @@ get_header(); ?>
 
 <script>
 (function($) {
+  // Store fresh nonce globally - will be fetched on page load
+  let freshNonce = null;
+
   /**
    * Get fresh nonce from server
    * This is needed when using cache plugins like WP Rocket
-   * Uses REST API endpoint which properly supports GET method
+   * Uses AJAX endpoint with POST to ensure same user context as form submission
    */
   function getFreshNonce(callback) {
-    // Check if REST API URL is available
-    if (!dntheme_params.rest_url) {
-      // If REST API URL not available, use original nonce
-      callback(dntheme_params.dntheme_nonce);
-      return;
-    }
-
     $.ajax({
-      url: dntheme_params.rest_url,
-      type: 'GET',
+      url: dntheme_params.ajax_url,
+      type: 'POST',
       dataType: 'json',
+      data: {
+        action: 'get_fresh_nonce'
+      },
       success: function(response) {
         if (response.success && response.data && response.data.nonce) {
           // Update global nonce
@@ -256,11 +255,24 @@ get_header(); ?>
         }
       },
       error: function() {
-        // Fallback to original nonce if REST API request fails
+        // Fallback to original nonce if request fails
         callback(dntheme_params.dntheme_nonce);
       }
     });
   }
+
+  // Fetch fresh nonce immediately on page load
+  $(document).ready(function() {
+    if (typeof dntheme_params !== 'undefined' && dntheme_params.dntheme_nonce) {
+      // Use initial nonce as fallback
+      freshNonce = dntheme_params.dntheme_nonce;
+    }
+    
+    // Fetch fresh nonce in background
+    getFreshNonce(function(nonce) {
+      freshNonce = nonce;
+    });
+  });
 
   $('#regenerate-pdf-btn').on('click', function() {
     const $button = $(this);
@@ -271,65 +283,80 @@ get_header(); ?>
     // Disable button and show loading
     $button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Đang tạo lại PDF...');
 
-    // Get fresh nonce before submitting to avoid cache issues
-    getFreshNonce(function(freshNonce) {
-      $.ajax({
-        url: dntheme_params.ajax_url,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-          action: 'regenerate_order_pdf',
-          nonce: freshNonce,
-          order_id: orderId,
-          phone: phone
-        },
-        success: function(response) {
-          if (response.success) {
-            // Show success message
-            if (window.Swal) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Thành công',
-                text: response.data.message || 'PDF đã được tạo lại thành công!',
-                confirmButtonText: 'OK'
-              }).then(function() {
-                // Reload page to show new PDF URL
-                location.reload();
-              });
-            } else {
-              alert(response.data.message || 'PDF đã được tạo lại thành công!');
+    // Use fresh nonce if available, otherwise fetch it
+    if (freshNonce) {
+      // Use cached nonce (already loaded on page load)
+      submitRegeneratePdf(freshNonce, orderId, phone, $button, originalText);
+    } else {
+      // Fallback: fetch nonce if not loaded yet
+      getFreshNonce(function(nonce) {
+        freshNonce = nonce;
+        submitRegeneratePdf(nonce, orderId, phone, $button, originalText);
+      });
+    }
+  });
+
+  function submitRegeneratePdf(nonce, orderId, phone, $button, originalText) {
+    $.ajax({
+      url: dntheme_params.ajax_url,
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        action: 'regenerate_order_pdf',
+        nonce: nonce,
+        order_id: orderId,
+        phone: phone
+      },
+      success: function(response) {
+        if (response.success) {
+          // Refresh nonce for next submission (if user stays on page)
+          getFreshNonce(function(newNonce) {
+            freshNonce = newNonce;
+          });
+          
+          // Show success message
+          if (window.Swal) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Thành công',
+              text: response.data.message || 'PDF đã được tạo lại thành công!',
+              confirmButtonText: 'OK'
+            }).then(function() {
+              // Reload page to show new PDF URL
               location.reload();
-            }
+            });
           } else {
-            // Show error
-            if (window.Swal) {
-              Swal.fire({
-                icon: 'error',
-                title: 'Có lỗi xảy ra',
-                text: response.data || 'Không thể tạo lại PDF'
-              });
-            } else {
-              alert('Có lỗi xảy ra: ' + (response.data || 'Không thể tạo lại PDF'));
-            }
-            $button.prop('disabled', false).html(originalText);
+            alert(response.data.message || 'PDF đã được tạo lại thành công!');
+            location.reload();
           }
-        },
-        error: function(xhr, status, error) {
-          console.error('AJAX Error:', error);
+        } else {
+          // Show error
           if (window.Swal) {
             Swal.fire({
               icon: 'error',
               title: 'Có lỗi xảy ra',
-              text: 'Không thể kết nối đến server. Vui lòng thử lại.'
+              text: response.data || 'Không thể tạo lại PDF'
             });
           } else {
-            alert('Có lỗi xảy ra: Không thể kết nối đến server. Vui lòng thử lại.');
+            alert('Có lỗi xảy ra: ' + (response.data || 'Không thể tạo lại PDF'));
           }
           $button.prop('disabled', false).html(originalText);
         }
-      });
+      },
+      error: function(xhr, status, error) {
+        if (window.Swal) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Có lỗi xảy ra',
+            text: 'Không thể kết nối đến server. Vui lòng thử lại.'
+          });
+        } else {
+          alert('Có lỗi xảy ra: Không thể kết nối đến server. Vui lòng thử lại.');
+        }
+        $button.prop('disabled', false).html(originalText);
+      }
     });
-  });
+  }
 })(jQuery);
 </script>
 
