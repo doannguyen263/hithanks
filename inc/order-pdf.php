@@ -48,7 +48,39 @@ function generate_order_pdf($order_id, $order_detail, $order_overview, $contact_
   $pdfGenerated = false;
   if (class_exists('Mpdf\\Mpdf')) {
     try {
-      $mpdf = new \Mpdf\Mpdf(['tempDir' => $upload_dir['basedir'] . '/mpdf-temp']);
+      // Get font directory path
+      $font_dir = get_template_directory() . '/assets/fonts/UTM_Avo/';
+      
+      // Check if TTF font files exist
+      $font_regular_ttf = $font_dir . 'UTM_Avo.ttf';
+      $font_bold_ttf = $font_dir . 'UTM_AvoBold.ttf';
+      
+      // Basic mPDF config
+      $mpdf_config = [
+        'tempDir' => $upload_dir['basedir'] . '/mpdf-temp',
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 15,
+        'margin_bottom' => 15,
+      ];
+      
+      // Register custom fonts if TTF files exist
+      if (file_exists($font_regular_ttf) && file_exists($font_bold_ttf)) {
+        $mpdf_config['fontDir'] = [
+          $font_dir,
+        ];
+        $mpdf_config['fontdata'] = [
+          'utmavo' => [  // Font name must be lowercase, no special chars
+            'R' => 'UTM_Avo.ttf',
+            'B' => 'UTM_AvoBold.ttf',
+          ],
+        ];
+        $mpdf_config['default_font'] = 'utmavo';
+      }
+      
+      $mpdf = new \Mpdf\Mpdf($mpdf_config);
       $logo = get_field('logo', 'option');
 
       // Render header
@@ -92,9 +124,20 @@ function generate_order_pdf($order_id, $order_detail, $order_overview, $contact_
       $mpdf->WriteHTML(ob_get_clean());
 
       $mpdf->Output($pdfPath, \Mpdf\Output\Destination::FILE);
-      $pdfGenerated = true;
+      
+      // Verify PDF was created successfully
+      if (file_exists($pdfPath) && filesize($pdfPath) > 0) {
+        $pdfGenerated = true;
+      } else {
+        throw new Exception('PDF file was not created or is empty');
+      }
     } catch (\Throwable $e) {
       error_log('[order-pdf] mPDF error: ' . $e->getMessage());
+      error_log('[order-pdf] mPDF stack trace: ' . $e->getTraceAsString());
+      // Clean up empty/invalid PDF file if exists
+      if (file_exists($pdfPath)) {
+        @unlink($pdfPath);
+      }
     }
   } elseif (class_exists('Dompdf\\Dompdf')) {
     // Fallback for Dompdf - use HTML method
@@ -158,6 +201,21 @@ function render_order_pdf_header($order_id)
     <title>Đơn hàng #<?php echo $order_id; ?></title>
     <link href="<?php echo get_template_directory_uri(); ?>/assets/css/order-pdf.css" rel="stylesheet">
     <style>
+      /* Override font-family for mPDF - use registered font name 'utmavo' */
+      body {
+        font-family: 'utmavo', 'UTM_Avo', sans-serif !important;
+      }
+      h1, h2, h3, h4, h5, h6, .section-title {
+        font-family: 'utmavo', 'UTM_AvoBold', sans-serif !important;
+        font-weight: bold;
+      }
+      .workflow-title, .workflow-section-title, .workflow-subsection-title {
+        font-family: 'utmavo', 'UTM_AvoBold', sans-serif !important;
+        font-weight: bold;
+      }
+      .design-order-title-en, .design-order-title-vi {
+        font-family: 'utmavo', 'UTM_AvoBold', sans-serif !important;
+      }
     </style>
   </head>
 
